@@ -1,0 +1,60 @@
+# The hatchward documentation site. Served by GitHub Pages from the root of this
+# repository's main branch (Settings → Pages → Deploy from a branch → main /).
+#
+# Every .md file here is BOTH a page on this site and a document read on
+# github.com. That is why nothing in this config asks the documents to change:
+# the three plugins below exist precisely so that no doc needs front matter and
+# no cross-document link needs rewriting.
+#
+#   jekyll-optional-front-matter  renders a front-matter-less .md as a page.
+#                                 errors.md is generated from hatchward/core's
+#                                 error registry and published here unchanged,
+#                                 so it carries no front matter.
+#   jekyll-relative-links         rewrites `errors.md#ecmd--commands` to the
+#                                 built URL, so the same link works in both
+#                                 places.
+#   jekyll-titles-from-headings   takes each page's title from its `# H1`.
+#
+# All three ship enabled in GitHub Pages' own build. They are named here anyway:
+# the site does not work without them, so it should say so.
+
+title: Hatchward
+description: Hosted agent-fleet orchestrator — enroll a machine and it runs the assignments the hosted control plane hands it.
+# Empty, not "/hatchward": the site is served from the apex of the custom domain
+# in CNAME, so its root is "/". A project-page baseurl here would send every
+# stylesheet and every document link to /hatchward/… and 404 the whole site.
+baseurl: ""
+url: https://hatchward.dev
+influpert: https://influpert.com
+
+plugins:
+  - jekyll-optional-front-matter
+  - jekyll-relative-links
+  - jekyll-titles-from-headings
+
+# Files core writes here on release (errors.md, license.md, install.sh,
+# _includes/changelog.md) are listed in README.md. The repository's own notes
+# and the bundler files are not part of the site.
+exclude:
+  - README.md
+  - AGENTS.md
+  - CLAUDE.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+defaults:
+  - scope: { path: "" }
+    values: { layout: page }
+
+# Without this, each document is published twice: once rendered, and once as the
+# raw .md it was read from. One document, one URL.
+optional_front_matter:
+  remove_originals: true
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+sass:
+  style: compressed

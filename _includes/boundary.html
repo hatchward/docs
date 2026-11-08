@@ -1,0 +1,138 @@
+{%- comment -%}
+  The boundary. Everything hatchward runs sits inside one rule the reader owns,
+  and beside it is the full list of what crosses that rule.
+
+  Post-cutover there is exactly one local component (the runner, one per
+  machine) and exactly two things it ever calls out to: the hosted control
+  plane that hands out assignments, and whichever model vendor the container
+  doing the work calls. Both crossings are drawn, deliberately, rather than
+  collapsed into one — they are different traffic, to different places, and a
+  reader deciding what to allow through a firewall needs both named.
+
+  The control-plane crossing is a session, not a request/response poll: the
+  runner dials wss://<api>/v1/runners/socket and holds it open, receiving
+  assignments pushed down it rather than asking for them on a timer (see
+  internal/hostedrunner/websocket.go and client.go). Say "session"/"receives"
+  here, never "poll".
+
+  Brand marks are simplified to one ink. This is a wiring diagram, an 18px
+  outline reads where a lockup does not.
+{%- endcomment -%}
+<figure class="fig">
+  <div class="fig__scroll">
+    <svg class="fig__svg" viewBox="0 0 980 502" role="img"
+         aria-labelledby="figtitle figdesc" preserveAspectRatio="xMidYMid meet">
+      <title id="figtitle">Where hatchward runs, and what crosses the boundary</title>
+      <desc id="figdesc">A boundary labelled "your machines" contains two enrolled runners,
+        each with its own outbound arrow. Two arrows leave the boundary; none enter. Beside
+        it, a panel names both crossings: control-plane traffic (an outbound session the
+        runner holds open, receiving assignments and reporting results over it) and model
+        inference, made from inside the container a runner spawned, on the operator's own
+        vendor account. Below, a runner status register lists each machine, the project
+        workspace it is enrolled for, and its current assignment.</desc>
+
+      <defs>
+        <symbol id="i-server" viewBox="0 0 18 18">
+          <rect x="1.8" y="2.7" width="14.4" height="5.1" rx=".9" fill="none" stroke="currentColor"/>
+          <rect x="1.8" y="10.2" width="14.4" height="5.1" rx=".9" fill="none" stroke="currentColor"/>
+          <path d="M4.7 5.25h.02M4.7 12.75h.02" fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+        <symbol id="i-cli" viewBox="0 0 18 18">
+          <rect x="1.6" y="3" width="14.8" height="12" rx="1.4" fill="none" stroke="currentColor"/>
+          <path d="M4.6 7.4 7.2 9.6 4.6 11.8M9.4 12h4" fill="none" stroke="currentColor"/>
+        </symbol>
+        <symbol id="i-model" viewBox="0 0 18 18">
+          <rect x="4.6" y="4.6" width="8.8" height="8.8" rx=".8" fill="none" stroke="currentColor"/>
+          <path d="M7 4.6V2.1M11 4.6V2.1M7 13.4v2.5M11 13.4v2.5M4.6 7H2.1M4.6 11H2.1M13.4 7h2.5M13.4 11h2.5" fill="none" stroke="currentColor"/>
+        </symbol>
+      </defs>
+
+      <!-- ── the boundary ────────────────────────────────────────────── -->
+      <!-- Card row pitch is 96 (card height 64 + 32 gap), first card at y=70.
+           Both this rect's height and the "what crosses" card's height below
+           track the card count: height = 38 + 96*N. Adding a third runner
+           means growing both rects to height="326" and adding a card at
+           y=262. -->
+      <rect class="f-bound" x="10" y="34" width="560" height="230"/>
+      <rect class="f-knock" x="24" y="26" width="140" height="16"/>
+      <text class="f-lab" x="30" y="39">YOUR MACHINES</text>
+
+      <g>
+        <rect class="f-card" x="32" y="70" width="508" height="64"/>
+        <use class="ic ic--dim" href="#i-server" x="46" y="81" width="18" height="18"/>
+        <text class="f-con" x="72" y="94">build01-a3f1</text>
+        <text class="f-dim" x="46" y="118">hatchward &#183; acme-web</text>
+        <text class="f-con-b f-ok" x="526" y="118" text-anchor="end">&#10003; holds HW-318</text>
+      </g>
+      <g>
+        <rect class="f-card" x="32" y="166" width="508" height="64"/>
+        <use class="ic ic--dim" href="#i-server" x="46" y="177" width="18" height="18"/>
+        <text class="f-con" x="72" y="190">runner02-b7c2</text>
+        <text class="f-dim" x="46" y="214">hatchward &#183; acme-mobile</text>
+        <text class="f-con-b f-ok" x="526" y="214" text-anchor="end">&#10003; holds HW-317</text>
+      </g>
+
+      <!-- Two crossings, not one: control-plane traffic from every runner, and
+           model inference from inside whichever container is doing the work.
+           Collapsing them into a single arrow would hide that the second one
+           goes somewhere else entirely — the operator's own model account,
+           never through hatchward. -->
+      <path class="f-arrow" d="M540 102 H626"/>
+      <polygon class="f-head" points="632,102 623,97.5 623,106.5"/>
+      <path class="f-arrow" d="M540 198 H626"/>
+      <polygon class="f-head" points="632,198 623,193.5 623,202.5"/>
+
+      <!-- ── what crosses ────────────────────────────────────────────── -->
+      <rect class="f-card" x="632" y="34" width="338" height="230"/>
+      <rect class="f-strip" x="633" y="35" width="336" height="31"/>
+      <text class="f-lab" x="648" y="55">WHAT CROSSES THE BOUNDARY</text>
+      <path class="f-line" d="M632 66 H970"/>
+
+      <!-- control plane -->
+      <use class="ic" href="#i-cli" x="646" y="93" width="18" height="18"/>
+      <text class="f-con" x="676" y="106">hosted control plane</text>
+      <rect class="f-chip" x="902" y="95" width="52" height="16"/>
+      <text class="f-chip-t" x="928" y="107" text-anchor="middle">WSS</text>
+      <text class="f-note" x="676" y="122">enroll once &#183; stays connected &#183; receives assignments</text>
+      <path class="f-dash" d="M648 138 H954"/>
+
+      <!-- model inference -->
+      <use class="ic" href="#i-model" x="646" y="164" width="18" height="18"/>
+      <text class="f-con" x="676" y="177">your model vendor</text>
+      <rect class="f-chip" x="902" y="166" width="52" height="16"/>
+      <text class="f-chip-t" x="928" y="178" text-anchor="middle">HTTPS</text>
+      <text class="f-note" x="676" y="193">from inside the container, on your account</text>
+
+      <path class="f-line" d="M632 220 H970"/>
+      <text class="f-con-b" x="648" y="242">&#8592;&#8194;nothing</text>
+
+      <!-- ── runner status ───────────────────────────────────────────── -->
+      <text class="f-lab" x="10" y="304">RUNNER STATUS &#183; ONE MACHINE, ONE OR MORE ENABLED PROJECTS</text>
+      <path class="f-line" d="M10 314 H970"/>
+
+      <text class="f-lab" x="16" y="332">MACHINE</text>
+      <text class="f-lab" x="190" y="332">PROJECT</text>
+      <text class="f-lab" x="420" y="332">WORKSPACE</text>
+      <text class="f-lab" x="760" y="332">ASSIGNMENT</text>
+      <path class="f-line" d="M10 342 H970"/>
+
+      <rect class="f-band" x="10" y="342" width="960" height="28"/>
+      <text class="f-con" x="16" y="361">build01-a3f1</text>
+      <text class="f-con" x="190" y="361">acme-web</text>
+      <text class="f-dim" x="420" y="361">~/fleet/acme-web</text>
+      <text class="f-con f-ok" x="760" y="361">&#10003; holds HW-318</text>
+
+      <text class="f-con" x="16" y="389">runner02-b7c2</text>
+      <text class="f-con" x="190" y="389">acme-mobile</text>
+      <text class="f-dim" x="420" y="389">~/fleet/acme-mobile</text>
+      <text class="f-con f-ok" x="760" y="389">&#10003; holds HW-317</text>
+
+      <path class="f-line" d="M10 398 H970"/>
+      <text class="f-dim" x="16" y="420">two machines &#183; two projects &#183; your accounts, your rates, no middleman</text>
+    </svg>
+  </div>
+  <figcaption class="fig__note">
+    Every line leaving the boundary is one your machines opened, and the list is
+    complete — there is no line coming back the other way.
+  </figcaption>
+</figure>

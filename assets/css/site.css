@@ -1,0 +1,516 @@
+/* ==========================================================================
+   hatchward — greenbar
+   --------------------------------------------------------------------------
+   The whole product speaks in aligned columns and an append-only audit trail.
+   The physical object that IS aligned columns and append-only is continuous-
+   feed line-printer paper, so this site is an operations ledger rather than a
+   terminal. The alternating band is structural, not decorative: one band is
+   one row is one machine-written record. Bands appear only behind machine
+   output — never behind prose a human wrote.
+
+   Two voices, two faces. Newsreader is the human voice and carries every word
+   of argument. Martian Mono is the machine's, and is restricted to labels,
+   headers and counters. IBM Plex Mono renders anything that must hold 80
+   columns. "Humans are sacred" is the product's rule; here it is a typeface.
+
+   Exactly three signal colours, because doctor has exactly three verdicts:
+   ok / WARN / FAIL. The interaction colour is deliberately outside that trio
+   so a link can never be mistaken for a verdict.
+   ========================================================================== */
+
+/* ---- faces --------------------------------------------------------------- */
+
+@font-face{font-family:'Martian Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/martian-mono-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Martian Mono';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/martian-mono-normal-600.woff2') format('woff2')}
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/newsreader-normal-400-600.woff2') format('woff2')}
+@font-face{font-family:'Newsreader';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/newsreader-italic-400.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/plex-mono-normal-400.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/plex-mono-normal-500.woff2') format('woff2')}
+
+/* ---- tokens -------------------------------------------------------------- */
+
+:root{
+  --paper:#FAFBF8;
+  --paper-2:#F3F6F1;
+  --bar:#E4EDE0;
+  --rule:#C9D4C6;
+  --rule-soft:#DFE7DC;
+  --ink:#14181B;
+  --ink-2:#55605C;
+  --ink-3:#7C8983;
+
+  --ok:#1E6B47;
+  --warn:#9A6A0B;
+  --fail:#A0342A;
+  --stamp:#2C3A8E;
+  --stamp-wash:#E7EAF6;
+
+  --machine:'Martian Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --human:'Newsreader',Iowan Old Style,Georgia,'Times New Roman',serif;
+  --console:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  /* Dingbats live outside the latin subsets these webfonts ship, so the
+     verdict glyphs are handed to the platform on purpose rather than by
+     accident — exactly as the CLI hands them to your terminal.
+     No colour-emoji font in this stack: ⏸ and ⚠ default to emoji presentation,
+     and an emoji paints its own colour, which would silently overrule the
+     ok/warn/fail palette. The markup pairs this with U+FE0E. */
+  --glyph:ui-sans-serif,'Segoe UI Symbol','Noto Sans Symbols 2',system-ui,sans-serif;
+
+  --s1:.25rem; --s2:.5rem;  --s3:.75rem; --s4:1rem;
+  --s5:1.5rem; --s6:2.25rem; --s7:3.5rem; --s8:5.5rem;
+
+  --wide:74rem;
+  --measure:37rem;
+}
+
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0E1211;
+    --paper-2:#131817;
+    --bar:#181F1B;
+    --rule:#28322C;
+    --rule-soft:#1E2622;
+    --ink:#E6EDE7;
+    --ink-2:#9BAAA2;
+    --ink-3:#78877F;
+
+    --ok:#4FBF89;
+    --warn:#D9A441;
+    --fail:#E0685C;
+    --stamp:#93A2F0;
+    --stamp-wash:#1A1F33;
+  }
+}
+
+/* ---- base ---------------------------------------------------------------- */
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--human);
+  font-size:1.0625rem;
+  line-height:1.62;
+  font-synthesis-weight:none;
+  -webkit-font-smoothing:antialiased;
+  overflow-wrap:break-word;
+}
+
+a{color:var(--stamp);text-decoration-thickness:1px;text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+
+:focus-visible{
+  outline:2px solid var(--stamp);
+  outline-offset:3px;
+  border-radius:1px;
+}
+
+.skip{
+  position:absolute;left:var(--s4);top:-4rem;z-index:20;
+  padding:var(--s2) var(--s4);
+  background:var(--paper);border:1px solid var(--stamp);
+  font-family:var(--machine);font-size:.75rem;text-decoration:none;
+  transition:top .12s;
+}
+.skip:focus{top:var(--s4)}
+
+/* Small mono label. The single most repeated device on the site. */
+.lab{
+  font-family:var(--machine);
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+.mt-4{margin-top:var(--s4)}
+.mt-7{margin-top:var(--s7)}
+
+/* ---- masthead / colophon -------------------------------------------------- */
+
+.masthead{
+  border-bottom:1px solid var(--rule);
+  background:var(--paper);
+  position:sticky;top:0;z-index:10;
+}
+.masthead__in{
+  max-width:var(--wide);margin:0 auto;
+  padding:var(--s3) var(--s5);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:var(--s2) var(--s4);
+}
+
+.mark{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
+.mark__glyph{
+  width:1rem;height:1rem;flex:none;
+  background:
+    linear-gradient(var(--stamp) 0 0) 0 40% / 100% 20% no-repeat,
+    linear-gradient(var(--bar) 0 0)   0 0   / 100% 20% no-repeat,
+    linear-gradient(var(--bar) 0 0)   0 80% / 100% 20% no-repeat;
+  border:1px solid var(--rule);
+}
+.mark__word{
+  font-family:var(--machine);font-weight:600;font-size:.9rem;letter-spacing:-.02em;
+}
+
+.masthead__nav{display:flex;gap:var(--s4)}
+.masthead__nav a{
+  font-family:var(--machine);font-size:.72rem;letter-spacing:.04em;
+  color:var(--ink-2);text-decoration:none;
+}
+.masthead__nav a:hover{color:var(--stamp);text-decoration:underline}
+
+@media (max-width:26rem){
+  .masthead__in{padding:var(--s3) var(--s4);gap:var(--s3)}
+  .masthead__nav{gap:var(--s3)}
+  .masthead__nav a{font-size:.66rem}
+}
+
+.colophon{border-top:1px solid var(--rule);margin-top:var(--s8);background:var(--paper-2)}
+.colophon__in{max-width:var(--wide);margin:0 auto;padding:var(--s6) var(--s5)}
+.colophon__line{max-width:var(--measure);margin:0 0 var(--s4);color:var(--ink-2);font-size:.95rem}
+.colophon__meta{
+  margin:0;display:flex;flex-wrap:wrap;gap:var(--s3);
+  font-family:var(--machine);font-size:.7rem;color:var(--ink-3);
+}
+.colophon__by{
+  margin:var(--s5) 0 0;padding-top:var(--s4);border-top:1px solid var(--rule);
+  font-family:var(--machine);font-size:.7rem;letter-spacing:.06em;color:var(--ink-3);
+}
+.colophon__by a{color:var(--ink-2);font-weight:600;text-decoration:none}
+.colophon__by a:hover{color:var(--stamp);text-decoration:underline}
+
+code{
+  font-family:var(--console);
+  font-size:.86em;
+  background:var(--bar);
+  padding:.1em .34em;
+  border-radius:2px;
+  /* Inline code in these docs is mostly paths and flags — `~/.hatchward/<id>/
+     config.yml` is wider than a phone and has no natural break opportunity.
+     Let it break rather than push the page sideways. Block code is unaffected:
+     `pre` scrolls instead, because alignment there is load-bearing. */
+  overflow-wrap:anywhere;
+}
+.prose pre code,.shellblock code{overflow-wrap:normal}
+
+/* ==========================================================================
+   Landing
+   ========================================================================== */
+
+.band{border-top:1px solid var(--rule);padding:var(--s7) var(--s5)}
+.band--flush{border-top:0}
+.band__in{max-width:var(--wide);margin:0 auto}
+
+.band__head{margin-bottom:var(--s6);max-width:var(--measure)}
+.band__title{
+  font-family:var(--human);font-weight:500;font-size:1.7rem;line-height:1.22;
+  margin:var(--s2) 0 var(--s3);letter-spacing:-.01em;
+}
+.band__sub{margin:0;color:var(--ink-2)}
+
+/* ---- hero ---------------------------------------------------------------- */
+
+.hero{padding:var(--s7) var(--s5) var(--s6)}
+.hero__in{
+  max-width:var(--wide);margin:0 auto;
+  display:grid;gap:var(--s7);
+  /* minmax(0,…) not 1fr: an auto-minimum track sizes itself to the
+     shellblock's min-content and would push the page sideways on a phone. */
+  grid-template-columns:minmax(0,1fr);
+}
+@media (min-width:62rem){
+  .hero__in{grid-template-columns:minmax(20rem,25rem) minmax(0,1fr);align-items:start;gap:var(--s6)}
+}
+
+.hero__say{max-width:30rem}
+.hero__h{
+  font-family:var(--human);font-weight:500;
+  font-size:clamp(2.05rem,5vw,2.95rem);
+  line-height:1.08;letter-spacing:-.02em;
+  margin:var(--s3) 0 var(--s4);
+}
+/* The human's possessive, set in the human face. The rest of the sentence is
+   the same serif — but "your" is the whole argument, so it gets the ink. */
+.you{font-style:italic;color:var(--stamp)}
+
+.hero__lede{margin:0 0 var(--s5);color:var(--ink-2);font-size:1.1rem}
+
+.hero__cta{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center}
+.btn{
+  font-family:var(--machine);font-size:.75rem;font-weight:600;letter-spacing:.02em;
+  text-decoration:none;padding:.7rem 1.05rem;border:1px solid var(--stamp);
+  color:var(--paper);background:var(--stamp);
+}
+.btn:hover{filter:brightness(1.12)}
+.btn--ghost{background:transparent;color:var(--stamp)}
+.btn--ghost:hover{background:var(--stamp-wash);filter:none}
+
+.fig__note{
+  margin:var(--s4) 0 0;max-width:44rem;
+  font-size:.95rem;color:var(--ink-2);
+}
+
+/* ---- two-voice layer diagram ---------------------------------------------- */
+
+.layers{display:grid;gap:var(--s4);grid-template-columns:minmax(0,1fr)}
+@media (min-width:48rem){.layers{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s5)}}
+.layer{border:1px solid var(--rule);padding:var(--s5);background:var(--paper-2)}
+.layer__h{font-family:var(--machine);font-size:.8rem;font-weight:600;margin:var(--s2) 0 var(--s3);color:var(--ink)}
+.layer__p{margin:0 0 var(--s3);color:var(--ink-2);font-size:.98rem}
+.layer__p:last-child{margin-bottom:0}
+
+/* ---- a note under a band -------------------------------------------------- */
+
+/* The band head carries the argument; this carries the qualification that comes
+   after the evidence, at the same measure. */
+.band__note{
+  margin:var(--s5) 0 0;max-width:var(--measure);
+  color:var(--ink-2);font-size:.98rem;
+}
+.band__note + .band__note{margin-top:var(--s4)}
+
+/* ---- banded key/value list -------------------------------------------------
+   Used for the project subcommands and the runner-guarantees list. A row per
+   entry, banded, because the answer is a fact about the binary rather than an
+   argument. */
+.slots{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.slots li{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:.15rem;
+  padding:var(--s3);border-bottom:1px solid var(--rule-soft);
+}
+@media (min-width:52rem){
+  /* 14rem, not 12: `controlplane · registry` is the widest pair and at 12 the
+     separator ends a line with `registry` orphaned under it. */
+  .slots li{grid-template-columns:13rem 14rem minmax(0,1fr);gap:var(--s4);align-items:baseline}
+}
+.slots li:nth-child(even){background:var(--bar)}
+.slots__k{font-family:var(--console);font-size:.84rem;font-weight:500;color:var(--ink)}
+.slots__v{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.slots__n{color:var(--ink-2);font-size:.95rem;line-height:1.5}
+
+/* Inline code carries a --bar background, which is invisible on a --bar band.
+   Inside banded rows the typeface is the distinction, exactly as the two-voice
+   rule at the top of this file intends. */
+.slots code{background:none;padding:0;color:var(--ink);font-weight:500}
+
+/* ---- three consequences --------------------------------------------------- */
+
+/* Reuses .layer. The layer diagram is two cards because there are two layers;
+   this is three because there are three consequences, and neither number is a
+   grid preference. */
+.trio{display:grid;gap:var(--s4);grid-template-columns:minmax(0,1fr)}
+@media (min-width:56rem){.trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5)}}
+.trio .layer__h{margin-top:var(--s2)}
+
+/* ---- the boundary figure -------------------------------------------------- */
+
+/* Not .scrollx: that one bleeds to calc(100% + 9rem) above 75rem for the
+   document grid's benefit, which inside .band__in overflows the page. */
+.fig{margin:var(--s6) 0 0}
+.fig__scroll{overflow-x:auto}
+.fig__svg{
+  display:block;width:100%;height:auto;
+  /* Below this the 12px console type in the register is unreadable, so the
+     figure scrolls in its own box rather than shrinking to fit a phone. */
+  min-width:52rem;
+}
+
+.f-bound{fill:none;stroke:var(--stamp);stroke-width:1.5}
+.f-card{fill:var(--paper-2);stroke:var(--rule);stroke-width:1}
+.f-strip{fill:var(--bar);stroke:none}
+.f-chip{fill:var(--bar);stroke:none}
+.f-band{fill:var(--bar)}
+.f-knock{fill:var(--paper)}
+.f-line{stroke:var(--rule);stroke-width:1;fill:none}
+.f-dash{stroke:var(--rule-soft);stroke-width:1;stroke-dasharray:3 3;fill:none}
+.f-arrow{stroke:var(--ink-3);stroke-width:1.25;fill:none}
+.f-head{fill:var(--ink-3)}
+
+.f-lab{font-family:var(--machine);font-size:9px;font-weight:600;letter-spacing:1.1px;fill:var(--ink-3)}
+.f-chip-t{font-family:var(--machine);font-size:7.5px;font-weight:600;letter-spacing:.8px;fill:var(--ink-3)}
+.f-con{font-family:var(--console);font-size:12px;fill:var(--ink)}
+.f-con-b{font-family:var(--console);font-size:12px;font-weight:500;fill:var(--ink)}
+.f-dim{font-family:var(--console);font-size:10px;fill:var(--ink-3)}
+.f-note{font-family:var(--console);font-size:8.6px;fill:var(--ink-3)}
+.f-ok{fill:var(--ok)}
+
+/* Marks inherit `color` across the <use> boundary, so shipped and unwritten are
+   one class each rather than two copies of every symbol. */
+.ic{color:var(--ink);stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
+.ic--dim{color:var(--ink-3)}
+
+/* ---- install -------------------------------------------------------------- */
+
+.install{display:grid;gap:var(--s5);grid-template-columns:minmax(0,1fr)}
+@media (min-width:56rem){.install{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+.shellblock{
+  margin:0;background:var(--paper-2);border:1px solid var(--rule);
+  padding:var(--s4);overflow-x:auto;
+  font-family:var(--console);font-size:.78rem;line-height:1.7;
+}
+.shellblock .c{color:var(--ink-3)}
+.shellblock .p{color:var(--ok)}
+
+/* ---- docs index ----------------------------------------------------------- */
+
+.index__group{margin-bottom:var(--s6)}
+.index__gh{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;
+  border-bottom:1px solid var(--rule);padding-bottom:var(--s2);margin-bottom:var(--s2)}
+.index__note{color:var(--ink-3);font-size:.92rem;font-style:italic}
+.index__list{list-style:none;margin:0;padding:0}
+.index__list li:nth-child(even){background:var(--bar)}
+.index__list a{
+  display:grid;grid-template-columns:1fr;gap:.1rem;
+  padding:var(--s3);text-decoration:none;color:inherit;
+  border-bottom:1px solid var(--rule-soft);
+}
+@media (min-width:48rem){
+  .index__list a{grid-template-columns:14rem 1fr;gap:var(--s4);align-items:baseline}
+}
+.index__t{font-family:var(--console);font-size:.88rem;font-weight:500;color:var(--stamp)}
+.index__list a:hover .index__t{text-decoration:underline}
+.index__b{color:var(--ink-2);font-size:.95rem;line-height:1.5}
+
+/* ==========================================================================
+   Documents
+   ========================================================================== */
+
+.shell{
+  max-width:var(--wide);margin:0 auto;padding:var(--s5);
+  display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s5);
+}
+@media (min-width:56rem){
+  .shell{grid-template-columns:14rem minmax(0,1fr);gap:var(--s7);padding:var(--s6) var(--s5)}
+}
+
+.spine{border:1px solid var(--rule);padding:var(--s3) var(--s4)}
+.spine__toggle{
+  font-family:var(--machine);font-size:.7rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;color:var(--ink-2);
+}
+.spine__group{
+  font-family:var(--machine);font-size:.6rem;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);margin:var(--s4) 0 var(--s2);
+}
+.spine__list{list-style:none;margin:0;padding:0}
+.spine__list a{
+  display:block;padding:.28rem 0;font-size:.92rem;
+  text-decoration:none;color:var(--ink-2);
+}
+.spine__list a:hover{color:var(--stamp);text-decoration:underline}
+.spine__list a[aria-current="page"]{color:var(--ink);font-weight:500}
+.spine__list a[aria-current="page"]::before{
+  content:"";display:inline-block;width:.45rem;height:.45rem;
+  background:var(--stamp);margin-right:.45rem;vertical-align:.08em;
+}
+
+@media (min-width:56rem){
+  .spine{position:sticky;top:4.4rem;align-self:start;max-height:calc(100vh - 6rem);overflow-y:auto;border:0;padding:0;border-left:1px solid var(--rule);padding-left:var(--s4)}
+  .spine__toggle{display:none}
+  .spine__in{display:block !important}
+}
+
+/* Content column. Everything below is scoped to .prose so kramdown's bare
+   element output can be styled without leaking into the landing page. */
+.prose{min-width:0;max-width:44rem}
+
+.crumb{font-family:var(--machine);font-size:.65rem;letter-spacing:.06em;color:var(--ink-3);margin:0 0 var(--s5)}
+.crumb a{color:var(--ink-3)}
+
+.prose h1{
+  font-family:var(--human);font-weight:500;letter-spacing:-.02em;
+  font-size:clamp(1.9rem,4.2vw,2.5rem);line-height:1.14;
+  margin:0 0 var(--s5);
+}
+/* The wizard rules its section titles to the width of the title itself.
+   display:table reproduces that: the rule stops where the words stop. */
+.prose h2{
+  display:table;max-width:100%;
+  font-family:var(--human);font-weight:500;font-size:1.5rem;line-height:1.25;
+  margin:var(--s7) 0 var(--s4);padding-bottom:.28rem;
+  border-bottom:1px solid var(--rule);letter-spacing:-.01em;
+}
+.prose h3{font-family:var(--console);font-weight:500;font-size:1.02rem;margin:var(--s6) 0 var(--s3);letter-spacing:-.01em}
+.prose h4{font-family:var(--machine);font-weight:600;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:var(--s5) 0 var(--s2)}
+
+/* Body already sets the reading size. Restating it here as `.prose p` would
+   out-specify .crumb and .prose__source, which are deliberately small. */
+.prose p{margin:0 0 var(--s4)}
+.prose ul,.prose ol{margin:0 0 var(--s4);padding-left:1.35rem}
+.prose li{margin-bottom:var(--s2)}
+.prose li::marker{color:var(--ink-3)}
+
+.prose blockquote{
+  margin:0 0 var(--s5);padding:var(--s3) var(--s4);
+  border-left:2px solid var(--stamp);background:var(--stamp-wash);
+  color:var(--ink-2);
+}
+.prose blockquote p:last-child{margin-bottom:0}
+
+.prose pre{
+  margin:0 0 var(--s5);padding:var(--s4);
+  background:var(--paper-2);border:1px solid var(--rule);
+  overflow-x:auto;font-size:.8rem;line-height:1.6;
+}
+.prose pre code{background:none;padding:0;font-size:inherit}
+
+.prose hr{border:0;border-top:1px solid var(--rule);margin:var(--s6) 0}
+
+/* Machine-written tables get the band. errors.md is the reason this exists. */
+.scrollx{overflow-x:auto;margin:0 0 var(--s5);border:1px solid var(--rule)}
+
+/* Prose is capped at a reading measure; a reference table is not prose and
+   gains nothing from being narrow. Where the grid has spare width, tables take
+   it — the same rule that gives machine output its own typeface gives it its
+   own column width. */
+@media (min-width:75rem){
+  .scrollx{width:calc(100% + 9rem);max-width:calc(100vw - 20rem)}
+}
+.prose table{border-collapse:collapse;width:100%;font-size:.9rem}
+.prose thead th{
+  font-family:var(--machine);font-size:.6rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);text-align:left;
+  padding:var(--s3);border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+.prose tbody td{padding:var(--s3);vertical-align:top;border-bottom:1px solid var(--rule-soft)}
+.prose tbody tr:nth-child(even){background:var(--bar)}
+.prose tbody td:first-child{white-space:nowrap}
+.prose tbody td code{background:none;padding:0;color:var(--stamp);font-weight:500}
+
+.anchor{
+  margin-left:.4rem;font-family:var(--machine);font-size:.65em;
+  color:var(--ink-3);text-decoration:none;opacity:0;transition:opacity .12s;
+}
+.prose h2:hover .anchor,.prose h3:hover .anchor,.anchor:focus{opacity:1}
+/* Hover-only affordance, and on a narrow screen it is what tips a long heading
+   past the viewport. There is no hover on a phone to reveal it anyway. */
+@media (max-width:56rem){.anchor{display:none}}
+
+/* ---- the licence page ------------------------------------------------------
+   LICENSE is hard-wrapped, indented plain text, so it is published inside a
+   fenced block: Markdown would reflow the paragraphs, and reflowing the
+   paragraphs of an agreement changes the document a licensee is shown. It is
+   still a legal page rather than a code sample, so it drops the code chrome
+   and reads at prose size. */
+.legal .prose{max-width:52rem}
+.legal .prose pre{
+  background:none;border:0;padding:0;
+  font-size:.92rem;line-height:1.66;color:var(--ink);
+  white-space:pre-wrap;      /* never scroll an agreement sideways */
+  overflow-wrap:anywhere;
+}
+.legal .prose pre code{font-family:var(--console)}
+
+/* ---- motion --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:5rem}

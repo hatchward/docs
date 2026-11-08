@@ -1,0 +1,11 @@
+---
+layout: default
+---
+<div class="shell">
+  {% include docnav.html %}
+
+  <main class="prose" id="main">
+    <p class="crumb"><a href="{{ '/' | relative_url }}#docs">Docs</a> <span aria-hidden="true">/</span> {{ page.title }}</p>
+    {{ content }}
+  </main>
+</div>

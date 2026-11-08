@@ -1,0 +1,21 @@
+{%- comment -%}
+  The docs spine. Wrapped in <details> so that it collapses to a single control
+  on narrow screens; CSS forces it permanently open from 900px up, where there
+  is room for the full list beside the text.
+{%- endcomment -%}
+<details class="spine" id="spine">
+  <summary class="spine__toggle">Documents</summary>
+  <nav class="spine__in" aria-label="Documents">
+    {%- for group in site.data.nav %}
+    <p class="spine__group">{{ group.group }}</p>
+    <ul class="spine__list">
+      {%- for item in group.items %}
+      {%- assign href = item.file | replace: '.md', '.html' | relative_url %}
+      <li>
+        <a href="{{ href }}"{% if item.file == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a>
+      </li>
+      {%- endfor %}
+    </ul>
+    {%- endfor %}
+  </nav>
+</details>

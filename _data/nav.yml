@@ -1,0 +1,33 @@
+# The order documents are presented in, on the site index and in the docs
+# sidebar. Ordering lives here rather than in per-file front matter so that
+# every .md in this repository stays byte-identical to what github.com renders —
+# and so that errors.md, which is generated, needs no exception.
+#
+# Adding a doc without adding it here still publishes it; it just will
+# not appear in the navigation.
+#
+# Values are quoted: several blurbs contain a colon, which YAML would otherwise
+# read as a mapping.
+
+- group: "Operating a fleet"
+  note: "What an operator does, in the order they do it."
+  items:
+    - file: "install.md"
+      title: "Installing hatchward"
+      blurb: "One line on macOS and Linux, Homebrew, or the checksummed tarball by hand — plus the quarantine trap that kills a browser download silently, and the first-run sequence."
+    - file: "errors.md"
+      title: "Error codes"
+      blurb: "Every code hatchward can print, what it means, and what to do about it. Generated from the registry, so it cannot drift."
+    - file: "changelog.md"
+      title: "Changelog"
+      blurb: "What changed in each release of the hatchward CLI."
+    - file: "notion.md"
+      title: "Notion tickets"
+      blurb: "Connect a Notion source, import tickets, enable runner execution, and configure the hosted connection."
+
+- group: "Legal"
+  note: "What you are agreeing to."
+  items:
+    - file: "license.md"
+      title: "Licence terms"
+      blurb: "The end-user licence agreement, reproduced verbatim from the one that ships with every release."

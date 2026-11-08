@@ -1,0 +1,351 @@
+---
+layout: default
+title: Hatchward
+---
+
+<main id="main">
+
+  <!-- ── hero ──────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__in">
+      <div class="hero__say">
+        <p class="lab">Hosted agent-fleet runner</p>
+        <h1 class="hero__h">Enroll <em class="you">your</em> machine. It runs what the control plane hands it.</h1>
+        <p class="hero__lede">
+          Install the CLI, enroll with a one-time code, and the machine starts asking the
+          hosted control plane for work. Each assignment spawns a coding-agent worker in its
+          own container, on your machine, calling your own model accounts — no board
+          credentials on the CLI, no local database to run, nothing to elect.
+        </p>
+        <p class="hero__cta">
+          <a class="btn" href="#install">Set up a runner</a>
+          <a class="btn btn--ghost" href="#docs">Read the docs</a>
+        </p>
+      </div>
+
+      <div>
+        <pre class="shellblock"><span class="c"># first run on a fresh machine</span>
+<span class="p">$</span> hatchward
+enrollment code: ••••-••••
+enrolled as build01-a3f1
+waiting for an assignment…</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── structure ─────────────────────────────────────────────────────── -->
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Structure</p>
+        <h2 class="band__title">The runner enrolls and executes. Assignment lives with the control plane.</h2>
+        <p class="band__sub">
+          The binary you install is thin on purpose: identity, service supervision, and a
+          container per assignment. What to run, in what order, and on which model is
+          decided by the hosted control plane and arrives with the assignment itself.
+        </p>
+      </div>
+
+      <div class="layers">
+        <div class="layer">
+          <p class="lab">Layer 1</p>
+          <p class="layer__h">the hatchward binary</p>
+          <p class="layer__p">
+            Bare <code>hatchward</code> is the whole operator loop: it enrolls an
+            unenrolled machine, then asks the hosted control plane for work and spawns and
+            watches a containerized worker for each assignment it gets.
+          </p>
+          <p class="layer__p">
+            It owns runner identity, container isolation, and boot-time supervision —
+            nothing else runs locally.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Layer 2</p>
+          <p class="layer__h">the hosted control plane</p>
+          <p class="layer__p">
+            Your board, your routing, and which model and role each task calls for are
+            configuration on the hosted side. The assignment a runner receives already
+            carries the normalized fields a worker needs.
+          </p>
+          <p class="layer__p">
+            Worker-facing board, ask, and lifecycle operations route through
+            assignment-scoped hosted APIs — the CLI itself holds no board credentials.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── projects ──────────────────────────────────────────────────────── -->
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Projects</p>
+        <h2 class="band__title">One runner, as many projects as you enable.</h2>
+        <p class="band__sub">
+          A machine enrolls once. Which hosted projects it actually works, and where each
+          project's workspace lives on disk, is a separate, per-machine choice.
+        </p>
+      </div>
+
+      <ul class="slots">
+        <li>
+          <span class="slots__k">List</span>
+          <span class="slots__v"><code>project list</code></span>
+          <span class="slots__n">Every project this machine has enabled, per its own <code>runner.yml</code>.</span>
+        </li>
+        <li>
+          <span class="slots__k">Enable</span>
+          <span class="slots__v"><code>project enable &lt;id&gt;</code></span>
+          <span class="slots__n">With <code>--workspace-root &lt;alias&gt; --path &lt;dir&gt;</code>, binds a hosted project to a local directory under an alias you name.</span>
+        </li>
+        <li>
+          <span class="slots__k">Disable</span>
+          <span class="slots__v"><code>project disable &lt;id&gt;</code></span>
+          <span class="slots__n">Stops this machine picking up work for that project; the workspace alias is left in place.</span>
+        </li>
+      </ul>
+
+      <p class="band__note">
+        <strong>No board credentials on the CLI.</strong> Board, routing, and
+        worker-facing lifecycle operations run through hosted APIs scoped to the
+        assignment — the runner never holds a token that could reach your board directly.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── where it runs ─────────────────────────────────────────────────── -->
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Where it runs</p>
+        <h2 class="band__title">Nothing dials in.</h2>
+        <p class="band__sub">
+          Every connection the runner makes is one it opened. It calls out to the hosted
+          control plane for assignments, and the container it spawns for each one calls out
+          to your own model vendor account for inference. Nothing reaches back in.
+        </p>
+      </div>
+
+      {% include boundary.html %}
+
+      <div class="trio">
+        <div class="layer">
+          <p class="lab">Cost shape</p>
+          <p class="layer__h">your accounts, your rates</p>
+          <p class="layer__p">
+            Model spend runs on the accounts you already hold. No per-seat, no per-task
+            markup, no metered middleman standing between you and the model.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Capacity</p>
+          <p class="layer__h">the machine you buy</p>
+          <p class="layer__p">
+            No shared tenancy, no queue behind somebody else's customers, and no rate limit
+            you did not set yourself.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Procurement</p>
+          <p class="layer__h">no new vendor on the network</p>
+          <p class="layer__p">
+            Whatever your build machines already reach, the agents reach: same VPN, same
+            egress rules, same secrets manager, same git credentials. Nothing new to
+            approve.
+          </p>
+        </div>
+      </div>
+
+      <p class="band__note">
+        <strong>Workers are sandboxed.</strong> Every assignment runs in its own container,
+        spawned and watched by the runner — isolation is not a setting you choose, it is
+        the only mode there is.
+      </p>
+
+      <p class="band__note">
+        One thing this does not claim: your code does leave the network, on the model call
+        you were already making. What is added is the runner's own outbound connection to
+        the hosted control plane that hands out assignments.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── coordination ──────────────────────────────────────────────────── -->
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Coordination</p>
+        <h2 class="band__title">Assignment lives in one place, not brokered by each machine.</h2>
+        <p class="band__sub">
+          Every runner asks the same hosted control plane for work; nothing is negotiated
+          between machines. There is no leader to elect and no registry to poll, because
+          there is only one authority.
+        </p>
+      </div>
+
+      <div class="layers">
+        <div class="layer">
+          <p class="lab">What the control plane owns</p>
+          <p class="layer__h">assignment, routing, the audit trail</p>
+          <p class="layer__p">
+            A task goes to exactly one runner, at a time the control plane decides. Board
+            state, routing rules, and the record of what ran, where, and why are all
+            hosted — not something any one machine's crash or restart puts at risk.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">What the runner owns</p>
+          <p class="layer__h">its own identity, and nothing else's</p>
+          <p class="layer__p">
+            A runner knows who it is and which projects it has enabled. It asks for work,
+            executes what it is given in a container, and reports back — it holds no
+            opinion about any other machine in the fleet.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── what the runner guarantees ───────────────────────────────────── -->
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">What the runner guarantees</p>
+        <h2 class="band__title">Small surface, so there is less to get wrong.</h2>
+        <p class="band__sub">
+          The cutover traded a scheduler's worth of local guarantees for a hosted control
+          plane's. What is left on the machine is deliberately narrow.
+        </p>
+      </div>
+
+      <ul class="slots">
+        <li>
+          <span class="slots__k">Identity fails loud</span>
+          <span class="slots__v"><code>runner.identity</code></span>
+          <span class="slots__n">A corrupt or unreadable identity file is returned as an error, never silently re-enrolled — a crash-recovery guard against re-registering a machine that already has a history.</span>
+        </li>
+        <li>
+          <span class="slots__k">One mode of isolation</span>
+          <span class="slots__v">container</span>
+          <span class="slots__n">Every assignment runs in its own container, spawned and watched by the runner. It is not a setting — there is nothing else to choose.</span>
+        </li>
+        <li>
+          <span class="slots__k">Restart, don't babysit</span>
+          <span class="slots__v"><code>hatchward service install</code></span>
+          <span class="slots__n">A launchd or systemd unit supervises the process, so a crash or a reboot resumes on its own — no terminal or tmux session to keep alive.</span>
+        </li>
+        <li>
+          <span class="slots__k">Scripted enrollment</span>
+          <span class="slots__v"><code>--code-stdin</code></span>
+          <span class="slots__n">Provisioning scripts and CI pipe the one-time code instead of typing it; a boot-service unit with no TTY fails fast with a named error rather than hanging on a prompt.</span>
+        </li>
+      </ul>
+
+      <p class="band__note">
+        <strong>Not part of this cutover:</strong> <code>hatchward doctor</code> and
+        <code>hatchward config show/open</code> are deferred to a follow-up. Today the
+        runner either enrolls and runs, or tells you exactly why it couldn't.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── setup ─────────────────────────────────────────────────────────── -->
+  <section class="band" id="install">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Setup</p>
+        <h2 class="band__title">Three commands. The first one asks for a code.</h2>
+        <p class="band__sub">
+          One line on macOS and Linux — <code>curl -fsSL https://hatchward.dev/install.sh | sh</code>
+          — or <code>brew install hatchward/tap/hatchward</code>. Checksummed tarballs for
+          the four targets every release builds. The runtime is POSIX-only; Windows is not
+          supported in v1.
+        </p>
+      </div>
+
+      <div class="install">
+        <pre class="shellblock"><span class="c"># first run: asks for your enrollment code, then runs</span>
+<span class="p">$</span> hatchward
+
+<span class="c"># enable a project, and where its workspace lives on disk</span>
+<span class="p">$</span> hatchward project enable acme-web \
+    --workspace-root web --path ~/fleet/acme-web
+
+<span class="c"># keep it running across reboots and crashes</span>
+<span class="p">$</span> hatchward service install</pre>
+
+        <div>
+          <p>
+            <strong>Bare <code>hatchward</code> is the whole loop.</strong> On a machine
+            that has not enrolled yet, it prompts for a one-time enrollment code and
+            enrolls before it runs; on a machine that already has, it starts asking the
+            hosted control plane for work immediately. Scripted or unattended setups skip
+            the prompt with <code>hatchward enroll --code-stdin</code>, piping the code on
+            stdin.
+          </p>
+          <p>
+            <strong>Enabling a project</strong> binds a hosted project id to a local
+            directory under an alias you choose, with <code>project enable &lt;id&gt;
+            --workspace-root &lt;alias&gt; --path &lt;dir&gt;</code>. A machine can have
+            more than one project enabled; <code>project list</code> shows what is, and
+            <code>project disable</code> turns one off without discarding the alias.
+          </p>
+          <p>
+            <strong><code>service install</code></strong> registers the runner as a
+            boot-time service — launchd on macOS, systemd on Linux — so it survives a
+            reboot or a crash without anyone watching a terminal.
+            <code>service status</code> and <code>service uninstall</code> round it out.
+          </p>
+        </div>
+      </div>
+
+      <div class="band__head mt-7">
+        <p class="lab">Verifying a download</p>
+        <h3 class="band__title">A checksum, and platform-native signing.</h3>
+        <p class="band__sub">
+          <code>SHA256SUMS</code> in the release proves the tarball and the manifest agree
+          with each other, not where either came from. Apple Developer ID codesigning and
+          notarization, and Windows Authenticode, are supported in the release pipeline
+          where the platform credentials are configured; Homebrew installs whatever the
+          tap's formula points at.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── documents ─────────────────────────────────────────────────────── -->
+  <section class="band" id="docs">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Documentation</p>
+        <h2 class="band__title">What the binary does, not what it aspires to.</h2>
+        <p class="band__sub">
+          Each document below describes shipped behaviour. Where something is specified but
+          not yet built, it says so in the text.
+        </p>
+      </div>
+
+      {% for group in site.data.nav %}
+      <div class="index__group">
+        <div class="index__gh">
+          <span class="lab">{{ group.group }}</span>
+          <span class="index__note">{{ group.note }}</span>
+        </div>
+        <ul class="index__list">
+          {% for item in group.items %}
+          <li>
+            <a href="{{ item.file | replace: '.md', '.html' | relative_url }}">
+              <span class="index__t">{{ item.title }}</span>
+              <span class="index__b">{{ item.blurb }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{% include head.html %}</head>
+<body class="{{ page.body_class }}">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead__in">
+      <a class="mark" href="{{ '/' | relative_url }}">
+        <span class="mark__glyph" aria-hidden="true"></span>
+        <span class="mark__word">hatchward</span>
+      </a>
+      {%- comment -%}
+        No link to the repository, from anywhere on this site. hatchward is
+        proprietary and the repo is private, so such a link is a dead end for
+        every reader who is not on the team — which, once this site is public,
+        is every reader. Anything the site refers to has to live on the site.
+      {%- endcomment -%}
+      <nav class="masthead__nav" aria-label="Site">
+        <a href="{{ '/' | relative_url }}#docs">Docs</a>
+        <a href="{{ '/install.html' | relative_url }}">Install</a>
+      </nav>
+    </div>
+  </header>
+
+  {{ content }}
+
+  <footer class="colophon">
+    <div class="colophon__in">
+      <p class="colophon__line">
+        <span class="lab">hatchward</span> is proprietary software, licensed rather than sold.
+        See the licence terms for what that means for you.
+      </p>
+      <p class="colophon__meta">
+        <a href="{{ '/license.html' | relative_url }}">Licence terms</a>
+      </p>
+
+      <p class="colophon__by">
+        Powered by <a href="{{ site.influpert }}">Influpert</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
+</body>
+</html>
