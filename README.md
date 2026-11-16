@@ -19,6 +19,14 @@ reviewed and tested.
 
 To change one of them, open a pull request in hatchward/core.
 
+## Page addresses
+
+A page's canonical address is its `.html` file: `https://hatchward.dev/errors.html`.
+Link to that form. GitHub Pages also serves it without the extension
+(`/errors`), and `/errors/` redirects to it, keeping any `#section`. The
+redirects are listed under `defaults:` in `_config.yml`, so a new page that
+should answer at `/<page>/` needs an entry there.
+
 ## Everything else
 
 The rest of the site is maintained here:

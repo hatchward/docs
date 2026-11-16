@@ -14,8 +14,10 @@
 #                                 built URL, so the same link works in both
 #                                 places.
 #   jekyll-titles-from-headings   takes each page's title from its `# H1`.
+#   jekyll-redirect-from          writes the redirect pages listed under
+#                                 `defaults:` below.
 #
-# All three ship enabled in GitHub Pages' own build. They are named here anyway:
+# All four ship enabled in GitHub Pages' own build. They are named here anyway:
 # the site does not work without them, so it should say so.
 
 title: Hatchward
@@ -31,6 +33,7 @@ plugins:
   - jekyll-optional-front-matter
   - jekyll-relative-links
   - jekyll-titles-from-headings
+  - jekyll-redirect-from
 
 # Files core writes here on release (errors.md, license.md, install.sh,
 # _includes/changelog.md) are listed in README.md. The repository's own notes
@@ -46,6 +49,24 @@ exclude:
 defaults:
   - scope: { path: "" }
     values: { layout: page }
+  # Each page's canonical address is its .html file (/errors.html), and GitHub
+  # Pages also serves it without the extension (/errors). Neither makes a
+  # directory, so /errors/ would 404; these redirect it to the .html address.
+  # They live here, not in each page's front matter, so the documents stay
+  # front-matter-free (errors.md and license.md are written by hatchward/core).
+  # A new page that should answer at /<page>/ gets an entry here too.
+  - scope: { path: "changelog.md" }
+    values: { redirect_from: ["/changelog/"] }
+  - scope: { path: "errors.md" }
+    values: { redirect_from: ["/errors/"] }
+  - scope: { path: "github-projects.md" }
+    values: { redirect_from: ["/github-projects/"] }
+  - scope: { path: "install.md" }
+    values: { redirect_from: ["/install/"] }
+  - scope: { path: "license.md" }
+    values: { redirect_from: ["/license/"] }
+  - scope: { path: "notion.md" }
+    values: { redirect_from: ["/notion/"] }
 
 # Without this, each document is published twice: once rendered, and once as the
 # raw .md it was read from. One document, one URL.
