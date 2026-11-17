@@ -5,12 +5,14 @@
     the plugin's own template plus one change: the script carries the address's
     #fragment over, so /errors/#ecmd--commands lands on that section of
     /errors.html. A meta refresh drops the fragment, so it is only the fallback
-    for a browser with JavaScript off.
+    for a browser with JavaScript off. `jsonify`, not the plugin's own
+    `redirect.to_js`: GitHub Pages pins jekyll-redirect-from 0.16.0, which has
+    no `to_js`, and an empty value there sent browsers to /errors/NaN.
   {%- endcomment %}
   <meta charset="utf-8">
   <title>Redirecting&hellip;</title>
   <link rel="canonical" href="{{ page.redirect.to | escape }}">
-  <script>location.replace({{ page.redirect.to_js }} + location.hash)</script>
+  <script>location.replace({{ page.redirect.to | jsonify }} + location.hash)</script>
   <meta http-equiv="refresh" content="0; url={{ page.redirect.to | escape }}">
   <meta name="robots" content="noindex">
   <h1>Redirecting&hellip;</h1>

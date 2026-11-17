@@ -6,5 +6,8 @@
 
 source "https://rubygems.org"
 
-gem "github-pages", group: :jekyll_plugins
+# Pinned to the version GitHub Pages runs (https://pages.github.com/versions.json,
+# "github-pages"). Unpinned, bundler takes the newest release, whose plugins can
+# be ahead of Pages': 233 ships jekyll-redirect-from 0.17.0, Pages 232 has 0.16.0.
+gem "github-pages", "= 232", group: :jekyll_plugins
 gem "webrick"
