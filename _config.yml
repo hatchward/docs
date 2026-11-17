@@ -63,6 +63,8 @@ defaults:
     values: { redirect_from: ["/github-projects/"] }
   - scope: { path: "install.md" }
     values: { redirect_from: ["/install/"] }
+  - scope: { path: "mahfouz.md" }
+    values: { redirect_from: ["/mahfouz/"] }
   - scope: { path: "license.md" }
     values: { redirect_from: ["/license/"] }
   - scope: { path: "notion.md" }
