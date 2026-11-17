@@ -24,6 +24,9 @@
     - file: "notion.md"
       title: "Notion tickets"
       blurb: "Connect a Notion source, import tickets, enable runner execution, and configure the hosted connection."
+    - file: "mahfouz.md"
+      title: "Mahfouz tickets"
+      blurb: "Connect a Mahfouz account, choose a database as a board, run assignments against its rows, and configure the hosted connection."
 
 - group: "Legal"
   note: "What you are agreeing to."
