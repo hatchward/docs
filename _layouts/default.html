@@ -16,10 +16,23 @@
         every reader who is not on the team — which, once this site is public,
         is every reader. Anything the site refers to has to live on the site.
       {%- endcomment -%}
-      <nav class="masthead__nav" aria-label="Site">
-        <a href="{{ '/' | relative_url }}#docs">Docs</a>
-        <a href="{{ '/install.html' | relative_url }}">Install</a>
-      </nav>
+      <div class="masthead__end">
+        <nav class="masthead__nav" aria-label="Site">
+          <a href="{{ '/guide.html' | relative_url }}"{% if page.layout == 'page' and page.path != 'install.md' and page.path != 'changelog.md' %} aria-current="true"{% endif %}>Guide</a>
+          <a href="{{ '/install.html' | relative_url }}"{% if page.path == 'install.md' %} aria-current="page"{% endif %}>Install</a>
+          <a href="{{ '/changelog.html' | relative_url }}"{% if page.path == 'changelog.md' %} aria-current="page"{% endif %}>Changelog</a>
+        </nav>
+        {%- comment -%}
+          Light / Dark / System. Needs the script, so it ships hidden and
+          site.js reveals it. The choice is applied before first paint by the
+          inline script in head.html.
+        {%- endcomment %}
+        <div class="theme" id="theme" role="group" aria-label="Colour theme" hidden>
+          <button type="button" data-theme-choice="light">Light</button>
+          <button type="button" data-theme-choice="dark">Dark</button>
+          <button type="button" data-theme-choice="system">Auto</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -31,9 +44,18 @@
         <span class="lab">hatchward</span> is proprietary software, licensed rather than sold.
         See the licence terms for what that means for you.
       </p>
-      <p class="colophon__meta">
-        <a href="{{ '/license.html' | relative_url }}">Licence terms</a>
-      </p>
+      <nav class="colophon__cols" aria-label="Guide pages">
+        {%- for group in site.data.nav.groups %}
+        <div>
+          <p class="lab">{{ group.group }}</p>
+          <ul>
+            {%- for item in group.items %}
+            <li><a href="{{ item.file | replace: '.md', '.html' | relative_url }}">{{ item.title }}</a></li>
+            {%- endfor %}
+          </ul>
+        </div>
+        {%- endfor %}
+      </nav>
 
       <p class="colophon__by">
         Powered by <a href="{{ site.influpert }}">Influpert</a>

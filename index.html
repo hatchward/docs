@@ -19,7 +19,7 @@ title: Hatchward
         </p>
         <p class="hero__cta">
           <a class="btn" href="#install">Set up a runner</a>
-          <a class="btn btn--ghost" href="#docs">Read the docs</a>
+          <a class="btn btn--ghost" href="{{ '/guide.html' | relative_url }}">Read the guide</a>
         </p>
       </div>
 
@@ -322,29 +322,26 @@ waiting for an assignment…</pre>
         <p class="lab">Documentation</p>
         <h2 class="band__title">What the binary does, not what it aspires to.</h2>
         <p class="band__sub">
-          Each document below describes shipped behaviour. Where something is specified but
+          Every page in the guide describes shipped behaviour. Where something is specified but
           not yet built, it says so in the text.
         </p>
       </div>
 
-      {% for group in site.data.nav %}
-      <div class="index__group">
-        <div class="index__gh">
-          <span class="lab">{{ group.group }}</span>
-          <span class="index__note">{{ group.note }}</span>
-        </div>
-        <ul class="index__list">
-          {% for item in group.items %}
-          <li>
-            <a href="{{ item.file | replace: '.md', '.html' | relative_url }}">
-              <span class="index__t">{{ item.title }}</span>
-              <span class="index__b">{{ item.blurb }}</span>
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endfor %}
+      {%- comment -%}
+        The full list lives on the guide overview, built from the same
+        _data/nav.yml; here, one line per group and a way in.
+      {%- endcomment %}
+      <ul class="index__list">
+        {%- for group in site.data.nav.groups %}{% unless group.flat %}
+        <li>
+          <a href="{{ '/guide.html' | relative_url }}#{{ group.group | slugify }}">
+            <span class="index__t">{{ group.group }}</span>
+            <span class="index__b">{{ group.items | map: "title" | join: " · " }}</span>
+          </a>
+        </li>
+        {%- endunless %}{% endfor %}
+      </ul>
+      <p class="hero__cta mt-4"><a class="btn" href="{{ '/guide.html' | relative_url }}">Open the guide</a></p>
     </div>
   </section>
 

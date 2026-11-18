@@ -59,6 +59,8 @@ defaults:
     values: { redirect_from: ["/changelog/"] }
   - scope: { path: "errors.md" }
     values: { redirect_from: ["/errors/"] }
+  - scope: { path: "guide.html" }
+    values: { redirect_from: ["/guide/"] }
   - scope: { path: "github-projects.md" }
     values: { redirect_from: ["/github-projects/"] }
   - scope: { path: "install.md" }

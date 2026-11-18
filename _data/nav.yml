@@ -1,36 +1,76 @@
-# The order documents are presented in, on the site index and in the docs
-# sidebar. Ordering lives here rather than in per-file front matter so that
-# every .md in this repository stays byte-identical to what github.com renders —
-# and so that errors.md, which is generated, needs no exception.
+# The guide's table of contents: the docs sidebar, the guide overview
+# (guide.html), the previous/next links under each page, and the footer all read
+# it, in this order. Ordering lives here rather than in per-file front matter so
+# that every .md in this repository stays byte-identical to what github.com
+# renders — and so that errors.md, which is generated, needs no exception.
 #
-# Adding a doc without adding it here still publishes it; it just will
-# not appear in the navigation.
+# Adding a doc without adding it here still publishes it; it just will not
+# appear in the navigation. github-projects.md is left out on purpose until it
+# is rewritten for a public reader.
+#
+# Per item:
+#   audience           keys from `audiences` below; shown as tags under the title.
+#   operator_sections  ids of the page's headings that are for Hatchward operators;
+#                      each gets an operator tag. Ids are kramdown's: the heading
+#                      text, lowercased, with spaces as hyphens.
 #
 # Values are quoted: several blurbs contain a colon, which YAML would otherwise
 # read as a mapping.
 
-- group: "Operating a fleet"
-  note: "What an operator does, in the order they do it."
-  items:
-    - file: "install.md"
-      title: "Installing hatchward"
-      blurb: "One line on macOS and Linux, Homebrew, or the checksummed tarball by hand — plus the quarantine trap that kills a browser download silently, and the first-run sequence."
-    - file: "errors.md"
-      title: "Error codes"
-      blurb: "Every code hatchward can print, what it means, and what to do about it. Generated from the registry, so it cannot drift."
-    - file: "changelog.md"
-      title: "Changelog"
-      blurb: "What changed in each release of the hatchward CLI."
-    - file: "notion.md"
-      title: "Notion tickets"
-      blurb: "Connect a Notion source, import tickets, enable runner execution, and configure the hosted connection."
-    - file: "mahfouz.md"
-      title: "Mahfouz tickets"
-      blurb: "Use a Mahfouz database as a project's board: connect, map its attributes, import, and configure the production OAuth client."
+audiences:
+  machine:
+    label: "Machine owner"
+    about: "Puts hatchward on a machine and keeps the runner going."
+  project:
+    label: "Project owner"
+    about: "Connects a ticket source and publishes a project's board."
+  operator:
+    label: "Hatchward operator"
+    about: "Runs Hatchward's hosted service: OAuth clients, secrets and production checks."
 
-- group: "Legal"
-  note: "What you are agreeing to."
-  items:
-    - file: "license.md"
-      title: "Licence terms"
-      blurb: "The end-user licence agreement, reproduced verbatim from the one that ships with every release."
+groups:
+  - group: "Guide"
+    flat: true
+    items:
+      - file: "guide.html"
+        title: "Overview"
+        blurb: "Where to start, and every page in the guide."
+
+  - group: "Get started"
+    note: "Put hatchward on a machine and enroll it."
+    items:
+      - file: "install.md"
+        title: "Installing hatchward"
+        blurb: "One line on macOS and Linux, Homebrew, or the checksummed tarball by hand — plus the quarantine trap that kills a browser download silently, and the first-run sequence."
+        audience: ["machine"]
+
+  - group: "Ticket sources"
+    note: "Where a project's tickets come from."
+    items:
+      - file: "notion.md"
+        title: "Notion tickets"
+        blurb: "Connect a Notion source, import tickets, enable runner execution, and configure the hosted connection."
+        audience: ["project", "operator"]
+        operator_sections: ["operator-configuration", "verify-an-environment"]
+      - file: "mahfouz.md"
+        title: "Mahfouz tickets"
+        blurb: "Use a Mahfouz database as a project's board: connect, map its attributes, import, and configure the production OAuth client."
+        audience: ["project", "operator"]
+        operator_sections: ["operator-configuration", "verify-production"]
+
+  - group: "Reference"
+    note: "Look things up."
+    items:
+      - file: "errors.md"
+        title: "Error codes"
+        blurb: "Every code hatchward can print, what it means, and what to do about it. Generated from the registry, so it cannot drift."
+      - file: "changelog.md"
+        title: "Changelog"
+        blurb: "What changed in each release of the hatchward CLI."
+
+  - group: "Legal"
+    note: "What you are agreeing to."
+    items:
+      - file: "license.md"
+        title: "Licence terms"
+        blurb: "The end-user licence agreement, reproduced verbatim from the one that ships with every release."

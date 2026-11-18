@@ -1,0 +1,63 @@
+---
+title: Guide
+---
+{%- comment -%}
+  The guide's front page. HTML rather than Markdown because it is built from
+  _data/nav.yml: a hand-written list here would drift from the sidebar. It is
+  the one page with front matter, which is fine: it is not a document anyone
+  reads on github.com.
+{%- endcomment -%}
+<h1>hatchward guide</h1>
+
+<p class="lede">
+  hatchward runs coding-agent work on machines you own. You enroll a machine, connect
+  a project's ticket source, and publish a policy; the hosted control plane then hands
+  the machine assignments, each in its own container.
+</p>
+
+<p class="lab guide__steps-h">Get running in three steps</p>
+<ol class="steps">
+  <li class="step">
+    <span class="lab">Install</span>
+    <a class="step__t" href="{{ '/install.html' | relative_url }}#install">Put the CLI on a machine</a>
+    <span class="step__b">One line on macOS and Linux, or Homebrew.</span>
+  </li>
+  <li class="step">
+    <span class="lab">Enroll</span>
+    <a class="step__t" href="{{ '/install.html' | relative_url }}#first-run">Run <code>hatchward</code></a>
+    <span class="step__b">Enter the one-time code. The machine then waits for work.</span>
+  </li>
+  <li class="step">
+    <span class="lab">Connect</span>
+    <a class="step__t" href="#ticket-sources">Choose a ticket source</a>
+    <span class="step__b">Notion or Mahfouz, connected from Integrations.</span>
+  </li>
+</ol>
+
+<h2 id="who-its-for">Who each page is for</h2>
+<p>Pages and sections carry a tag for the reader they're written for:</p>
+<dl class="audiences">
+  {%- for a in site.data.nav.audiences %}
+  <div>
+    <dt><span class="tag tag--{{ a[0] }}">{{ a[1].label }}</span></dt>
+    <dd>{{ a[1].about }}</dd>
+  </div>
+  {%- endfor %}
+</dl>
+
+{%- for group in site.data.nav.groups %}
+{%- unless group.flat %}
+<h2 id="{{ group.group | slugify }}">{{ group.group }}</h2>
+<p class="index__note">{{ group.note }}</p>
+<ul class="index__list">
+  {%- for item in group.items %}
+  <li>
+    <a href="{{ item.file | replace: '.md', '.html' | relative_url }}">
+      <span class="index__t">{{ item.title }}</span>
+      <span class="index__b">{{ item.blurb }}</span>
+    </a>
+  </li>
+  {%- endfor %}
+</ul>
+{%- endunless %}
+{%- endfor %}
