@@ -11,5 +11,12 @@
 
 <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ '/assets/fonts/newsreader-normal-400-600.woff2' | relative_url }}">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ '/assets/fonts/martian-mono-normal-600.woff2' | relative_url }}">
-<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+{%- comment -%}
+  GitHub Pages' CDN caches assets for four hours, but a page's HTML changes the
+  moment a build deploys. Without a version, new HTML is styled by the old
+  stylesheet until that cache expires. The build time changes on every build,
+  so each deploy asks for its own copy. site.js carries the same version.
+{%- endcomment %}
+{%- assign asset_version = site.time | date: '%s' %}
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}?v={{ asset_version }}">
 <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
