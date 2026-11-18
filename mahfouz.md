@@ -86,11 +86,8 @@ Mahfouz account repairs the existing connection.
 
 Hatchward runs one environment, production, and connects to Mahfouz's production
 platform. Register Hatchward's OAuth client once, after Mahfouz's production release
-includes its integration API:
-
-```bash
-bun run apps/api/scripts/register-mahfouz-client.ts --console-origin https://dash.hatchward.dev
-```
+includes its integration API: run the Mahfouz client registration script with the
+console origin `https://dash.hatchward.dev`.
 
 The script registers `https://dash.hatchward.dev/integrations/callback/mahfouz` with
 the scopes `vaults:read vaults:write`, and prints the client id, and the secret if
@@ -126,11 +123,8 @@ Mahfouz.
 
 There is no staging environment, so the first end-to-end check runs in production.
 Set the client id, then, before announcing Mahfouz, use a test account on a paid
-Mahfouz plan with a disposable vault and grant Hatchward that vault. Run the canary:
-
-```bash
-bun run apps/api/scripts/mahfouz-canary.ts --refresh-token-out <file>
-```
+Mahfouz plan with a disposable vault and grant Hatchward that vault. Run the Mahfouz canary script with
+`--refresh-token-out <file>`.
 
 It reads `MAHFOUZ_CANARY_REFRESH_TOKEN`, `MAHFOUZ_CANARY_RESOURCE` (`<vault>:<database>`)
 and `MAHFOUZ_CANARY_ROW` with the bindings above. It refreshes the grant, checks the
