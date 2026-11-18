@@ -1,75 +1,125 @@
 # GitHub Projects
 
-Connect an organization-owned GitHub Project (Projects v2) from Integrations,
-complete GitHub installation and user authorization, then select the connection
-in the project wizard. The authorizing GitHub user must be an active owner of
-the installation's organization. Personal Projects need a separate authorization
-flow and are outside this integration.
+Connect GitHub in **Integrations**, then choose an organization's GitHub Project
+(Projects v2) as the project's board in the project wizard. Each item in the Project is
+a ticket. Publishing a board and syncing it import tickets; they don't start work on
+their own.
 
-Select a Project, map its single-select status field, choose eligible statuses,
-and preview the imported items before publishing. Project URLs can be pasted
-directly. Status choices use GitHub option IDs, so identical labels remain
-distinct. Preview does not publish a revision or start work.
+## Connect
 
-Imports include issues, pull requests, and draft issues. Inaccessible content
-is hidden; archived items, pull requests, and items without an eligible mapped
-status remain ineligible for scheduling. Keep agent dispatch disabled when the
-project should only import tickets. Publishing and synchronization do not
-enable an unfinished runner execution path.
+Only Projects owned by an organization can be connected. Personal Projects aren't
+supported.
 
-Published projects provide Sync now, Pause, and Resume controls. Polling imports
-changes in bounded pages, resumes interrupted scans, and verifies missing
-memberships before removing them. A disconnected connection stops new provider
-access; reconnecting the same installation preserves the connection identity.
+Connecting installs Hatchward's GitHub App on the organization and then asks you to
+authorize it. The GitHub user who authorizes must be an active owner of that
+organization.
 
-Hosted assignments can request enabled, supported updates: project status,
-title and Markdown body, and issue or pull-request comments. Draft issues do
-not support comments. Permission checks apply to each item and action, and a
-readable connection may have no write capabilities. Body edits require a
-complete snapshot of at most 65,536 UTF-8 bytes and the expected hash. Refresh
-the assignment content before editing a changed snapshot.
+Disconnecting stops any new access to GitHub. Reconnecting the same
+installation repairs the existing connection rather than creating a new one.
 
-GitHub does not expose an atomic expected-hash condition for these writes.
-Hatchward checks the current value before writing and reads the result back,
-but a human edit between those requests can still race. An uncertain comment
-delivery is retained for reconciliation and is not automatically reposted.
+## Choose a project
+
+Select a Project, or paste its URL. Then:
+
+1. Map the Project's single-select status field to Hatchward states.
+2. Choose which statuses make an item eligible for work.
+3. Preview the items Hatchward would import, then publish.
+
+Status options are matched by GitHub's option id, not their label, so two options with
+the same name stay distinct. The preview doesn't publish anything or start work.
+
+## What is imported
+
+Hatchward imports the Project's issues, pull requests and draft issues.
+
+| Item | Imported as |
+| --- | --- |
+| An issue with an eligible status | An eligible ticket |
+| A draft issue with an eligible status | An eligible ticket |
+| A pull request | A ticket that is never eligible |
+| An archived item | A ticket that is never eligible |
+| An item without an eligible status | A ticket that is not eligible |
+| An item in a repository the App can't read | Hidden |
+
+## Import and sync
+
+A published project has **Sync now**, **Pause** and **Resume**. Hatchward polls the
+Project for changes; it doesn't need webhooks. Each import reads a bounded number of
+items at a time and picks up where an interrupted one stopped. An item that seems to be
+missing is checked again before its ticket is removed.
+
+To collect tickets without assigning any work, keep agent dispatch disabled for the
+project.
+
+## Item changes and comments
+
+An assignment can ask Hatchward to:
+
+- change the item's status in the Project
+- change its title or Markdown body
+- comment on an issue or pull request
+
+Draft issues can't take comments. Each change is checked against the permissions the
+connection has for that item, and a connection can be able to read a Project without
+being able to change anything in it.
+
+A body change sends the whole new body, at most 65,536 bytes of UTF-8, together with a
+hash of the body the assignment started from. If the body has changed since, refresh
+the assignment's content before editing it again.
+
+GitHub has no way to make a write conditional on the current value. Hatchward reads the
+current value, writes, then reads the result back, but a person editing the item
+between those steps can still collide with the change. If Hatchward can't tell whether a
+comment was posted, it keeps the comment to reconcile later and doesn't post it again
+by itself.
 
 ## Operator configuration
 
-Configure a GitHub App with organization Members read access and Projects read
-access. Projects write enables project status and draft title/body updates.
-Repository Issues and Pull requests permissions control their corresponding
-content edits and comments. Grant access to repositories whose items should be
-visible. Use the console integration callback `/integrations/callback/github`
-under the deployment's `HATCHWARD_CONSOLE_ORIGIN` for both setup and user authorization.
+Register a GitHub App for Hatchward with these permissions:
 
-The API requires these environment bindings:
+| Permission | Access | What it allows |
+| --- | --- | --- |
+| Organization: Members | Read | Checking that the authorizing user owns the organization |
+| Organization: Projects | Read | Reading Projects and their items |
+| Organization: Projects | Write | Status changes, and title and body changes to draft issues |
+| Repository: Issues | Read; write for changes | Title, body and comment changes on issues |
+| Repository: Pull requests | Read; write for changes | Title, body and comment changes on pull requests |
+
+Give the App access to every repository whose items should be visible. Use
+`/integrations/callback/github` on the console's origin (`HATCHWARD_CONSOLE_ORIGIN`) as
+the callback for both installation and user authorization.
+
+The API needs these bindings:
 
 | Binding | Value |
 | --- | --- |
-| `GITHUB_APP_ID_V1` | GitHub App ID |
-| `GITHUB_APP_SLUG_V1` | GitHub App slug |
-| `GITHUB_APP_CLIENT_ID_V1` | GitHub App OAuth client ID |
-| `GITHUB_APP_CLIENT_SECRET_V1` | GitHub App OAuth client secret |
-| `GITHUB_APP_PRIVATE_KEY_V1` | PEM signing key |
-| `HATCHWARD_INTEGRATION_CREDENTIAL_KEY_CURRENT_VERSION` | Active custody-key version, initially `1` |
-| `HATCHWARD_INTEGRATION_CREDENTIAL_KEY_V1` | Base64url-encoded 32-byte custody key |
+| `GITHUB_APP_ID_V1` | The GitHub App's id |
+| `GITHUB_APP_SLUG_V1` | The GitHub App's slug |
+| `GITHUB_APP_CLIENT_ID_V1` | The App's OAuth client id |
+| `GITHUB_APP_CLIENT_SECRET_V1` | The App's OAuth client secret |
+| `GITHUB_APP_PRIVATE_KEY_V1` | The App's PEM signing key |
+| `HATCHWARD_INTEGRATION_CREDENTIAL_KEY_CURRENT_VERSION` | The active credential key version, `1` to start |
+| `HATCHWARD_INTEGRATION_CREDENTIAL_KEY_V1` | A 32-byte key, base64url-encoded |
 
-Real secrets belong in environment-scoped Bitwarden Secrets Manager entries,
-then Worker secret bindings. Do not put values in repository files, command-line
-arguments, browser configuration, or individual GitHub Actions secrets. Missing
-configuration keeps connection endpoints unavailable. Existing GitHub sign-in
-credentials are a separate integration and do not substitute for App credentials.
+Until they are set, GitHub Projects can't be connected. Store the values in Bitwarden
+Secrets Manager and provision Worker secrets through the approved deployment process.
+Never put them in repository files, command-line arguments, browser configuration or
+GitHub Actions secrets of their own.
 
-Apply D1 migrations `0012` (board runtime), `0013` (temporary-token cleanup),
-and `0014` (shared scan budget), then run the schema assertion before
-deploying the API. Existing scheduler Durable Objects install their additive
-tables on initialization. The provider-operation queue also carries credential-free
-sync pointers; the existing scheduled handler repairs interrupted source changes
-and enqueues due imports. Webhooks are not required for this polling integration.
+Signing in to Hatchward with GitHub is a separate integration: its credentials can't
+stand in for the App's.
 
-Before production enablement, exercise an organization installation, owner
-verification, private-repository item visibility, an import, each enabled update,
-permission loss, and reconnect against a dedicated test Project. Local HTTP
-fixtures verify the integration code but do not verify the registered App or
-live GitHub permissions.
+## Verify before enabling
+
+Before turning GitHub Projects on for everyone, connect a dedicated test Project and
+check each of these:
+
+- installing the App on an organization
+- the organization-owner check
+- an item from a private repository
+- an import
+- each change an assignment can make
+- removing the App's access, then reconnecting
+
+Local test fixtures check Hatchward's code, not the registered App or GitHub's live
+permissions.

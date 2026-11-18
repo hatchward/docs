@@ -5,8 +5,7 @@
 # renders — and so that errors.md, which is generated, needs no exception.
 #
 # Adding a doc without adding it here still publishes it; it just will not
-# appear in the navigation. github-projects.md is left out on purpose until it
-# is rewritten for a public reader.
+# appear in the navigation.
 #
 # Per item:
 #   audience           keys from `audiences` below; shown as tags under the title.
@@ -57,6 +56,11 @@ groups:
         blurb: "Use a Mahfouz database as a project's board: connect, map its attributes, import, and configure the production OAuth client."
         audience: ["project", "operator"]
         operator_sections: ["operator-configuration", "verify-production"]
+      - file: "github-projects.md"
+        title: "GitHub Projects"
+        blurb: "Use an organization's GitHub Project as a project's board: connect, map its status field, import, and register the GitHub App."
+        audience: ["project", "operator"]
+        operator_sections: ["operator-configuration", "verify-before-enabling"]
 
   - group: "Reference"
     note: "Look things up."
