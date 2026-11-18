@@ -1,21 +1,34 @@
 {%- comment -%}
   The docs spine. Wrapped in <details> so that it collapses to a single control
-  on narrow screens; CSS forces it permanently open from 900px up, where there
-  is room for the full list beside the text.
+  on narrow screens; from 56rem up the script holds it open, where there is room
+  for the full list beside the text. Each group is its own <details>, open when
+  it holds the current page. A group marked `flat` in _data/nav.yml (the
+  overview) is listed without a heading.
+
+  Expects `nav_current` (the current page's nav item, or nil), assigned by the
+  page layout.
 {%- endcomment -%}
 <details class="spine" id="spine">
-  <summary class="spine__toggle">Documents</summary>
-  <nav class="spine__in" aria-label="Documents">
-    {%- for group in site.data.nav %}
-    <p class="spine__group">{{ group.group }}</p>
-    <ul class="spine__list">
+  <summary class="spine__toggle">{% if nav_current %}{{ nav_current.title }}{% else %}Guide{% endif %}</summary>
+  <nav class="spine__in" aria-label="Guide">
+    {%- for group in site.data.nav.groups %}
+    {%- if group.flat %}
+    <ul class="spine__list spine__list--flat">
       {%- for item in group.items %}
-      {%- assign href = item.file | replace: '.md', '.html' | relative_url %}
-      <li>
-        <a href="{{ href }}"{% if item.file == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a>
-      </li>
+      <li><a href="{{ item.file | replace: '.md', '.html' | relative_url }}"{% if item.file == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
       {%- endfor %}
     </ul>
+    {%- else %}
+    {%- assign here = group.items | where: "file", page.path | first %}
+    <details class="spine__group"{% if here %} open{% endif %}>
+      <summary>{{ group.group }}</summary>
+      <ul class="spine__list">
+        {%- for item in group.items %}
+        <li><a href="{{ item.file | replace: '.md', '.html' | relative_url }}"{% if item.file == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+        {%- endfor %}
+      </ul>
+    </details>
+    {%- endif %}
     {%- endfor %}
   </nav>
 </details>

@@ -63,8 +63,11 @@
   --measure:37rem;
 }
 
+/* Dark tokens apply when the system asks for dark and the reader has not
+   chosen Light, or when the reader has chosen Dark (the switch in the
+   masthead sets data-theme on <html>). Same values in both blocks. */
 @media (prefers-color-scheme:dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#0E1211;
     --paper-2:#131817;
     --bar:#181F1B;
@@ -79,8 +82,27 @@
     --fail:#E0685C;
     --stamp:#93A2F0;
     --stamp-wash:#1A1F33;
+    color-scheme:dark;
   }
 }
+:root[data-theme="dark"]{
+  --paper:#0E1211;
+  --paper-2:#131817;
+  --bar:#181F1B;
+  --rule:#28322C;
+  --rule-soft:#1E2622;
+  --ink:#E6EDE7;
+  --ink-2:#9BAAA2;
+  --ink-3:#78877F;
+
+  --ok:#4FBF89;
+  --warn:#D9A441;
+  --fail:#E0685C;
+  --stamp:#93A2F0;
+  --stamp-wash:#1A1F33;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{color-scheme:light}
 
 /* ---- base ---------------------------------------------------------------- */
 
@@ -392,12 +414,22 @@ code{
 .spine{border:1px solid var(--rule);padding:var(--s3) var(--s4)}
 .spine__toggle{
   font-family:var(--machine);font-size:.7rem;font-weight:600;letter-spacing:.08em;
-  text-transform:uppercase;cursor:pointer;color:var(--ink-2);
+  text-transform:uppercase;cursor:pointer;color:var(--ink);
 }
-.spine__group{
+/* A group is a <details>: its summary is the label, with a +/– marker, and it
+   starts open when it holds the current page. */
+.spine__group{margin:var(--s3) 0 0}
+.spine__group>summary{
+  list-style:none;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;gap:var(--s2);
   font-family:var(--machine);font-size:.6rem;font-weight:600;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--ink-3);margin:var(--s4) 0 var(--s2);
+  text-transform:uppercase;color:var(--ink-3);padding:var(--s2) 0;
 }
+.spine__group>summary::-webkit-details-marker{display:none}
+.spine__group>summary::after{content:"+";font-size:.8rem;letter-spacing:0}
+.spine__group[open]>summary::after{content:"\2013"}
+.spine__group>summary:hover{color:var(--ink)}
+.spine__list--flat{margin-top:var(--s3)}
 .spine__list{list-style:none;margin:0;padding:0}
 .spine__list a{
   display:block;padding:.28rem 0;font-size:.92rem;
@@ -506,6 +538,119 @@ code{
   overflow-wrap:anywhere;
 }
 .legal .prose pre code{font-family:var(--console)}
+
+/* ==========================================================================
+   Guide furniture: masthead switch, tags, pager, on-this-page, footer columns
+   ========================================================================== */
+
+.masthead__end{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s3) var(--s5)}
+.masthead__nav a[aria-current]{
+  color:var(--ink);text-decoration:underline;text-decoration-color:var(--stamp);
+  text-decoration-thickness:2px;text-underline-offset:.5em;
+}
+
+.theme{display:flex;border:1px solid var(--rule)}
+.theme button{
+  font:600 .6rem/1 var(--machine);letter-spacing:.06em;text-transform:uppercase;
+  padding:.4rem .5rem;border:0;background:none;color:var(--ink-3);cursor:pointer;
+}
+.theme button+button{border-left:1px solid var(--rule)}
+.theme button:hover{color:var(--ink)}
+.theme button[aria-pressed="true"]{background:var(--bar);color:var(--ink)}
+
+.visually-hidden{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;
+}
+
+/* Who a page or section is for. Machine voice, because it is a label; the
+   operator tag takes the warn colour because those sections are the ones most
+   readers should skip, not because anything is wrong. */
+.tags{display:flex;flex-wrap:wrap;gap:var(--s2);margin:calc(-1 * var(--s3)) 0 var(--s5)}
+.tag{
+  display:inline-block;font-family:var(--machine);font-size:.58rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;line-height:1.4;
+  padding:.18rem .45rem;border:1px solid var(--rule);color:var(--ink-2);background:var(--paper-2);
+  white-space:nowrap;
+}
+.tag--operator{border-color:var(--warn);color:var(--warn);background:none}
+.prose h2 .tag{margin-left:var(--s3);vertical-align:.28em}
+
+.pager{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s3);
+  margin:var(--s7) 0 0;padding-top:var(--s5);border-top:1px solid var(--rule);
+}
+.pager a{
+  display:flex;flex-direction:column;gap:.15rem;padding:var(--s3) var(--s4);
+  border:1px solid var(--rule);text-decoration:none;color:var(--ink);
+}
+.pager a:hover{border-color:var(--stamp);background:var(--stamp-wash)}
+.pager__next{grid-column:2;text-align:right}
+@media (max-width:36rem){
+  .pager{grid-template-columns:minmax(0,1fr)}
+  .pager__next{grid-column:1;text-align:left}
+}
+
+.toc{display:none}
+@media (min-width:80rem){
+  .shell:has(.toc:not([hidden])){max-width:88rem;grid-template-columns:14rem minmax(0,1fr) 12rem}
+  .toc:not([hidden]){display:block;position:sticky;top:4.4rem;align-self:start;max-height:calc(100vh - 6rem);overflow-y:auto}
+  /* The table widening below assumes there is nothing to its right. */
+  .shell:has(.toc:not([hidden])) .scrollx{width:100%;max-width:none}
+}
+.toc .lab{margin:0 0 var(--s2)}
+.toc__list{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+.toc__list a{
+  display:block;padding:.22rem 0 .22rem var(--s3);margin-left:-1px;
+  border-left:2px solid transparent;font-size:.86rem;line-height:1.35;
+  color:var(--ink-2);text-decoration:none;
+}
+.toc__list a:hover{color:var(--stamp)}
+.toc__list a[aria-current]{border-left-color:var(--stamp);color:var(--ink)}
+
+.colophon__cols{
+  display:grid;gap:var(--s5);grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));
+  margin:0 0 var(--s4);
+}
+.colophon__cols .lab{margin:0 0 var(--s2)}
+.colophon__cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}
+.colophon__cols a{color:var(--ink-2);text-decoration:none;font-size:.92rem}
+.colophon__cols a:hover{color:var(--stamp);text-decoration:underline}
+
+/* ---- the guide overview --------------------------------------------------- */
+
+.prose .lede{font-size:1.12rem;color:var(--ink-2)}
+.prose .guide__steps-h{margin:var(--s6) 0 var(--s3)}
+.prose ol.steps{
+  list-style:none;margin:0 0 var(--s5);padding:0;counter-reset:step;
+  display:grid;gap:var(--s3);grid-template-columns:minmax(0,1fr);
+}
+@media (min-width:48rem){.prose ol.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.prose .step{
+  counter-increment:step;position:relative;margin:0;
+  display:flex;flex-direction:column;gap:.15rem;
+  padding:var(--s3) var(--s4) var(--s4) 3.4rem;
+  border:1px solid var(--rule);background:var(--paper-2);
+}
+.prose .step::before{
+  content:counter(step);position:absolute;left:var(--s4);top:var(--s3);
+  width:1.6rem;height:1.6rem;display:grid;place-items:center;
+  border:2px solid var(--stamp);color:var(--stamp);
+  font:600 .78rem/1 var(--machine);
+}
+.step__t{font-weight:600;color:var(--ink);text-decoration:none;line-height:1.35}
+.step__t:hover{color:var(--stamp);text-decoration:underline}
+.step__b{color:var(--ink-2);font-size:.9rem;line-height:1.45}
+
+.audiences{margin:0 0 var(--s4);border-top:1px solid var(--rule)}
+.audiences div{
+  display:grid;gap:var(--s2) var(--s4);grid-template-columns:minmax(0,1fr);
+  padding:var(--s3) 0;border-bottom:1px solid var(--rule-soft);
+}
+@media (min-width:40rem){.audiences div{grid-template-columns:11rem minmax(0,1fr);align-items:baseline}}
+.audiences dt,.audiences dd{margin:0}
+.audiences dd{color:var(--ink-2);font-size:.95rem}
+.prose .index__note{margin:calc(-1 * var(--s2)) 0 var(--s3)}
 
 /* ---- motion --------------------------------------------------------------- */
 

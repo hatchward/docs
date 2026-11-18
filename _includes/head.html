@@ -3,6 +3,11 @@
 <title>{% if page.url == "/" %}{{ site.title }} — {{ site.description | split: "—" | first | strip }}{% else %}{{ page.title }} · {{ site.title }}{% endif %}</title>
 <meta name="description" content="{% if page.url == '/' %}{{ site.description }}{% else %}{{ page.title }} — {{ site.title }} documentation.{% endif %}">
 <meta name="color-scheme" content="light dark">
+{%- comment -%}
+  Apply a saved Light/Dark choice before first paint, so the page never flashes
+  the other theme. No saved choice (or no storage) means follow the system.
+{%- endcomment %}
+<script>try{var t=localStorage.getItem('hatchward-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 
 <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ '/assets/fonts/newsreader-normal-400-600.woff2' | relative_url }}">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ '/assets/fonts/martian-mono-normal-600.woff2' | relative_url }}">

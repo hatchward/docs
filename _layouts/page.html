@@ -1,11 +1,67 @@
 ---
 layout: default
 ---
+{%- comment -%}
+  Find this page in _data/nav.yml once: its item (title, audience), its group
+  (for the breadcrumb) and its neighbours in reading order (for the pager).
+  A page that is published but not listed (github-projects.md) gets none of
+  these and still renders.
+{%- endcomment -%}
+{%- assign nav_current = nil -%}
+{%- assign nav_group = nil -%}
+{%- assign nav_prev = nil -%}
+{%- assign nav_next = nil -%}
+{%- assign nav_last = nil -%}
+{%- for group in site.data.nav.groups -%}
+  {%- for item in group.items -%}
+    {%- if nav_current and nav_next == nil -%}{%- assign nav_next = item -%}{%- endif -%}
+    {%- if item.file == page.path -%}
+      {%- assign nav_current = item -%}
+      {%- assign nav_group = group -%}
+      {%- assign nav_prev = nav_last -%}
+    {%- endif -%}
+    {%- assign nav_last = item -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- assign guide_url = '/guide.html' | relative_url -%}
 <div class="shell">
   {% include docnav.html %}
 
-  <main class="prose" id="main">
-    <p class="crumb"><a href="{{ '/' | relative_url }}#docs">Docs</a> <span aria-hidden="true">/</span> {{ page.title }}</p>
+  <main class="prose" id="main"{% if nav_current.operator_sections %} data-operator-sections="{{ nav_current.operator_sections | join: ' ' }}" data-operator-label="{{ site.data.nav.audiences.operator.label }}"{% endif %}>
+    <p class="crumb">
+      {%- if page.path == 'guide.html' -%}
+      <a href="{{ '/' | relative_url }}">Home</a> <span aria-hidden="true">/</span> Guide
+      {%- else -%}
+      <a href="{{ guide_url }}">Guide</a> <span aria-hidden="true">/</span>
+      {%- if nav_group and nav_group.flat != true %} <a href="{{ guide_url }}#{{ nav_group.group | slugify }}">{{ nav_group.group }}</a> <span aria-hidden="true">/</span>{% endif %} {{ page.title }}
+      {%- endif -%}
+    </p>
+    {%- if nav_current.audience %}
+    <p class="tags" id="page-tags">
+      <span class="visually-hidden">For:</span>
+      {%- for key in nav_current.audience %}
+      <span class="tag tag--{{ key }}">{{ site.data.nav.audiences[key].label }}</span>
+      {%- endfor %}
+    </p>
+    {%- endif %}
+
     {{ content }}
+
+    {%- if nav_prev or nav_next %}
+    <nav class="pager" aria-label="Previous and next">
+      {%- if nav_prev %}
+      <a class="pager__prev" href="{{ nav_prev.file | replace: '.md', '.html' | relative_url }}" rel="prev"><span class="lab">Previous</span>{{ nav_prev.title }}</a>
+      {%- endif %}
+      {%- if nav_next %}
+      <a class="pager__next" href="{{ nav_next.file | replace: '.md', '.html' | relative_url }}" rel="next"><span class="lab">Next</span>{{ nav_next.title }}</a>
+      {%- endif %}
+    </nav>
+    {%- endif %}
   </main>
+
+  {%- comment -%} Filled by site.js from the page's h2s; stays hidden without it. {%- endcomment %}
+  <aside class="toc" id="toc" aria-labelledby="toc-h" hidden>
+    <p class="lab" id="toc-h">On this page</p>
+    <ul class="toc__list"></ul>
+  </aside>
 </div>
