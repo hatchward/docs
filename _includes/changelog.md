@@ -1,4 +1,205 @@
 {% raw %}
+<h2 id="v0.13.0">0.13.0</h2>
+
+**A runner that takes no work says why, a runner can enroll into a project by its slug,
+and the console links each task to its ticket.** Enrolling now enables the code's
+projects, so no further step is needed. No runner has to enroll again.
+
+### Added
+
+- `hatchward service restart` restarts the runner through whichever supervisor runs it:
+  Homebrew, launchd or systemd. It refuses with `ESVC006` when no boot service is
+  installed and `ESVC007` when both hatchward's own and Homebrew's are.
+- The runner writes a project discovery report to its log on every connect: one line for
+  each project that can't run here and why. `hatchward project list` shows the same
+  reasons under each project, and `--local` prints the old offline output.
+- The runner logs every offer it turns down and sends the full reason. The scheduler
+  withdraws the offer, backs that runner off for the revision (1, 2, 4, 8, then every 10
+  minutes), and the console shows the runner's reason as `RUNNER_REJECTED_OFFER`.
+- Tasks carry a `ticketUrl`, served by `GET /v1/tasks`. Home's Live dispatch and the Work
+  task pane link to the ticket. Migration `0025` adds the column.
+- Work and a project's Work tab page through older work, 25 rows at a time.
+- The setup wizard's Review names each problem and the step that fixes it, instead of a
+  JSON path. The Repository step warns about a repository no healthy GitHub connection
+  can reach and offers a repair.
+- A project's Danger zone moves to a new Settings tab.
+
+- `POST /v1/runners/enrollment-codes` accepts `projectSlugs` as an alternative to
+  `projectIds`, never both. The slugs are resolved within the account and the response
+  still returns `projectIds`. A slug that does not resolve gets the same
+  `PROJECT_ACCESS_DENIED` as an id that is refused.
+- `hatchward project enable` and `disable` take `--project-id <uuid>` or
+  `--project-slug <slug>`. `--project-id` and the positional UUID still work offline;
+  `--project-slug` asks the hosted API for the UUID.
+- `hatchward project list` shows a SLUG column, with `-` where the API sends no slug.
+- `GET /v1/runners/projects?include=slug` adds each project's `slug`. Without the
+  parameter the response is unchanged, so released runners decode it as before.
+- `hatchward enroll` (and first-run `hatchward`) enables every project the code was
+  issued for in `runner.yml`, under a workspace folder it asks for (default
+  `<runner home>/workspaces`, created if missing) as the alias `workspaces`. `--path`
+  names the folder and skips the question; `--code-stdin` without `--path` uses the
+  default. The folder is checked before the code is redeemed. If the projects cannot be
+  fetched, enrollment still succeeds and says how to enable them by hand.
+
+### Changed
+
+- An enrollment-code request names at most 99 projects, down from 100. A request with
+  100 failed with a 500, because D1 binds at most 100 parameters per query and the
+  account id is one of them; it is now refused with `INVALID_REQUEST`.
+- `GET /v1/runners/projects` no longer lists a deleted project. Its membership row
+  outlives the delete, so released runners saw it, archived, until the purge.
+- The project page, Plan & billing, Work, Integrations and the setup wizard use one
+  shared card layout. The Projects list drops its View details drawer.
+
+### Fixed
+
+- `hatchward service status` recognises a runner started with `brew services`, instead
+  of reporting `boot service: not installed`.
+- `hatchward project enable` suggests `--path` when `--workspace-root` is given a
+  directory.
+- A chosen repository moves off a broken GitHub connection when a healthy organization
+  lists it, so publish no longer fails.
+- The project header's status chip lines up with its buttons.
+
+<h2 id="v0.12.1">0.12.1</h2>
+
+**Runners can take work for projects published through the console again.** No commands,
+flags, config keys or `runner.yml` fields changed, and no runner has to enroll again.
+
+### Fixed
+
+- A project's minimum runner version is matched against a separate runner API version
+  (`0.1.0`), which runners report at enrollment, instead of their release version. Every
+  console-published project asked for 2.0.0, so no released runner could take its work.
+  Runners from 0.12.0 and earlier are recorded as `0.1.0` and need no upgrade. Migration
+  `0024` moves stored minimums to `0.1.0`.
+- A deleted project no longer holds runner capacity forever: the runner's session
+  abandons the project's reservations, cancels the work and frees the capacity.
+- The setup wizard's Repositories step no longer lists revoked GitHub connections.
+
+<h2 id="v0.12.0">0.12.0</h2>
+
+**A project can route tickets across several repositories, a Mahfouz database can be a
+board, and the console is redesigned.** The runner can clone the routed repository. No
+commands, flags, config keys or `runner.yml` fields changed.
+
+### Added
+
+- Projects with several repositories: each ticket runs against the repository its routing
+  rule names, or the project's default. Container runners clone it into an empty
+  `/workspace`. A runner enrolled before 0.12.0 must be revoked and enrolled again to
+  take this work.
+- Agents & routing edits a list of routing rules, the Repositories step chooses up to 32
+  repositories, and a project's Overview lists them.
+- Mahfouz as a board provider: connect over OAuth, sync by polling, and write back
+  comments, transitions, assignees, labels and content.
+- Projects can be archived and permanently deleted from the console. A deleted project's
+  slug is free at once, and a sweep purges its data afterwards.
+- The project page can enroll a runner.
+- Runner labels, which projects can require, and an agent catalog naming
+  `ghcr.io/hatchward/agent`.
+- Connections report required and missing permissions, and the sign-in code response says
+  when the code expires.
+
+### Changed
+
+- The console is rebuilt on a new design: shell, setup wizard, projects, Fleet, Home and
+  Work, Integrations, sign-in and billing.
+- The setup wizard has separate Board and Repository steps. Map tickets opens with a live
+  ticket preview and one "Pick up tickets in" control for every board.
+- `DELETE /v1/projects/:projectId` deletes the project permanently instead of archiving
+  it.
+- Tickets on Notion and Mahfouz boards can start while a scan is in progress, once the
+  scan has seen them.
+- Console requests time out after 60 seconds, or 150 for calls that wait on a board
+  provider.
+- hatchward.dev's error reference, license and install script are published from
+  `etc/site/` in this repository.
+- Dependencies: `golang.org/x/term` 0.48.0, `modernc.org/sqlite` 1.62.0.
+
+### Fixed
+
+- Generating a runner enrollment code in production. The runner audience now comes from
+  `HATCHWARD_API_ORIGIN`.
+- A revoked GitHub connection can be reconnected.
+- A wrong GitHub App ID is reported as Hatchward's fault, not as a connection to
+  reconnect.
+- Turning on Slack alerts no longer stops a project from being published.
+- Publishing, rolling back or saving a draft no longer brings an archived project back.
+- Mahfouz connects in production, and its board picker waits out a vault that is still
+  being prepared.
+- Enrollment, runner membership and revoke failures say what went wrong.
+
+### Removed
+
+- The staging environment. Production is the only deployed environment.
+- `docs/` from this repository. hatchward.dev is served from `hatchward/docs`.
+- `HATCHWARD_RUNNER_API_AUDIENCE`.
+
+<h2 id="v0.11.0">0.11.0</h2>
+
+**Operators can grant an account a complimentary plan, and queue health is measured with
+heartbeats.** The CLI's behaviour is unchanged since 0.10.0.
+
+### Added
+
+- Complimentary plans: grants stored in `complimentary_grants` outrank the Stripe
+  subscription wherever entitlement is decided.
+- An operator API at `/v1/admin/complimentary-grants` to grant, revoke and list them,
+  authenticated with `HATCHWARD_ADMIN_TOKEN_V1`.
+- Plan & billing shows a complimentary plan, its end date, and no checkout.
+- Queue heartbeats, with Datadog monitors for lag and unconsumed queues.
+
+### Changed
+
+- The API Worker no longer holds a Cloudflare API token.
+- `CONTROL_DB` migrations are append-only, and the database is never dropped.
+- The console's Expo dependency check runs offline against `bun.lock`.
+
+### Fixed
+
+- The Datadog Terraform key's documented scopes include `logs_read_data`.
+
+<h2 id="v0.10.0">0.10.0</h2>
+
+**Billing works on production, and the control plane's telemetry is in Datadog.** The
+CLI's behaviour is unchanged since 0.9.1.
+
+### Added
+
+- `ops/terraform/plans.yaml` defines the plans, and Terraform applies the Stripe catalog
+  in each environment.
+- The API Worker's logs reach Datadog through Logpush, with monitors and dashboards
+  managed in Terraform.
+- Google Workspace DKIM for `hatchward.dev`.
+
+### Changed
+
+- Cloudflare Terraform state is split into per-environment workspaces.
+- Staging deploys only when run by hand, not on every push to `develop`.
+- Plans are listed cheapest first.
+
+### Fixed
+
+- Sign in with GitHub on production: the deploy syncs the OAuth App's secrets from
+  Bitwarden, along with the GitHub App's and Stripe's.
+- Plan Checkout on production: restricted `rk_` Stripe keys are accepted, and plan
+  Products carry the tax code that Stripe Managed Payments requires.
+
+<h2 id="v0.9.1">0.9.1</h2>
+
+**The Homebrew formula and install docs use the `hatchward/homebrew-tap` name.** The CLI's
+behaviour is unchanged since 0.9.0.
+
+### Changed
+
+- The formula downloads from `hatchward/homebrew-tap`, and the docs install from
+  `hatchward/tap`. Existing `influpert/tap` taps keep working through GitHub's redirect.
+- The Go module path is `github.com/hatchward/core/src/cli`.
+- `hatchward.dev` DNS: the Google Workspace mail records and the DMARC policy are managed
+  in Terraform, and DMARC is now `p=quarantine` with relaxed alignment and aggregate
+  reports.
+
 <h2 id="v0.9.0">0.9.0</h2>
 
 **First signed and notarized macOS build, and the first release cut automatically on
@@ -34,8 +235,20 @@ The CLI's behaviour is unchanged since 0.7.0.
 enroll this machine to a hosted project with a one-time code, then run it. The
 self-hosted product — the local `init` wizard, offline licensing, the embedded
 control-plane server, leader election, and the local scheduler — is gone; see Removed
-below. This entry covers the whole cutover, landed as a stacked series of PRs on
-`cutover/hosted-cli`; the tag lands once the series merges to `main`.
+below. This release also promotes the current hosted platform and portable runner
+changes from `develop` to `main` as a coordinated upgrade.
+
+### Added
+
+- Native macOS execution through Docker Desktop and contract-3 images, with
+  bounded transport, enforced filesystem quotas, and completion/failure cleanup.
+- Runner-hosted credential-injecting TLS proxy with per-assignment trust and
+  hostname/private-address enforcement; real credentials never enter containers.
+- Hosted Notion/GitHub Projects integration, unified email-code authentication,
+  updated project/provider/billing console flows, catalog prices, Stripe plan
+  infrastructure, and local seed/reset tooling.
+- Coordinated `/v1/runners` API routes and API-origin configuration. Upgrade the
+  hosted API and runner together; use the matching contract-3 agent image.
 
 ### Removed
 
