@@ -7,8 +7,8 @@
   <header class="masthead">
     <div class="masthead__in">
       <a class="mark" href="{{ '/' | relative_url }}">
-        <span class="mark__glyph" aria-hidden="true"></span>
-        <span class="mark__word">hatchward</span>
+        <span class="mark__logo" aria-hidden="true"></span>
+        <span class="visually-hidden">Hatchward home</span>
       </a>
       {%- comment -%}
         No link to the repository, from anywhere on this site. hatchward is
@@ -23,16 +23,6 @@
           <a href="{{ '/install.html' | relative_url }}"{% if page.path == 'install.md' %} aria-current="page"{% endif %}>Install</a>
           <a href="{{ '/changelog.html' | relative_url }}"{% if page.path == 'changelog.md' %} aria-current="page"{% endif %}>Changelog</a>
         </nav>
-        {%- comment -%}
-          Light / Dark / System. Needs the script, so it ships hidden and
-          site.js reveals it. The choice is applied before first paint by the
-          inline script in head.html.
-        {%- endcomment %}
-        <div class="theme" id="theme" role="group" aria-label="Colour theme" hidden>
-          <button type="button" data-theme-choice="light">Light</button>
-          <button type="button" data-theme-choice="dark">Dark</button>
-          <button type="button" data-theme-choice="system">Auto</button>
-        </div>
         {%- comment -%} The hosted console, where every account starts. {%- endcomment %}
         <nav class="masthead__account" aria-label="Account">
           <a href="{{ site.console }}">Sign in</a>
@@ -67,9 +57,36 @@
         {%- endfor %}
       </nav>
 
-      <p class="colophon__by">
-        Powered by <a href="{{ site.influpert }}">Influpert</a>
-      </p>
+      {%- comment -%}
+        A large logo signs the page off, bottom left, with the credit on its
+        baseline at the right (the same footer as mahfouz.app).
+      {%- endcomment %}
+      <div class="colophon__sign">
+        <a class="colophon__logo" href="{{ '/' | relative_url }}">
+          <img src="{{ '/assets/images/logo.png' | relative_url }}" alt="Hatchward home" width="1096" height="200">
+        </a>
+        <div class="colophon__end">
+          {%- comment -%}
+            Light / Dark / Auto, as a dropdown that opens upward. Needs the script, so it ships
+            hidden and site.js reveals it and runs the menu. The choice is
+            applied before first paint by the inline script in head.html.
+          {%- endcomment %}
+          <div class="theme" id="theme" data-current="system" hidden>
+            <button type="button" class="theme__toggle" title="Colour theme" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-menu">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="light"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="dark"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="system"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              <span class="visually-hidden">Colour theme: <span class="theme__label">Auto</span></span>
+            </button>
+            <ul class="theme__menu" id="theme-menu" role="menu" aria-label="Colour theme" hidden>
+              <li role="none"><button type="button" role="menuitemradio" aria-checked="false" data-theme-choice="light"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="light"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span>Light</span></button></li>
+              <li role="none"><button type="button" role="menuitemradio" aria-checked="false" data-theme-choice="dark"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="dark"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span>Dark</span></button></li>
+              <li role="none"><button type="button" role="menuitemradio" aria-checked="false" data-theme-choice="system"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="system"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Auto</span></button></li>
+            </ul>
+          </div>
+          <p class="colophon__by">
+            Powered by <a href="{{ site.influpert }}">Influpert</a>
+          </p>
+        </div>
+      </div>
     </div>
   </footer>
 

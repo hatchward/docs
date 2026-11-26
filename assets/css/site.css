@@ -52,6 +52,7 @@
   --bound:var(--egyptian);
   --pill-bg:var(--egyptian);
   --footer:var(--egyptian-deep);
+  --logo:var(--egyptian);
 
   /* verdicts */
   --ok:#1E6B47;
@@ -111,6 +112,7 @@
     --bound:#86A2FF;
     --pill-bg:#2A4BC0;
     --footer:#060B19;
+    --logo:#FFFFFF;
 
     --ok:#4FBF89;
     --warn:#D9A441;
@@ -143,6 +145,7 @@
   --bound:#86A2FF;
   --pill-bg:#2A4BC0;
   --footer:#060B19;
+  --logo:#FFFFFF;
 
   --ok:#4FBF89;
   --warn:#D9A441;
@@ -202,8 +205,6 @@ a:hover{text-decoration-thickness:2px}
   color:var(--stamp);
 }
 
-.mt-4{margin-top:var(--s4)}
-.mt-7{margin-top:var(--s7)}
 
 /* ---- masthead ------------------------------------------------------------ */
 
@@ -222,17 +223,14 @@ a:hover{text-decoration-thickness:2px}
 }
 
 .mark{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
-/* The mark: an Egyptian Blue tile crossed by a single scarlet record. */
-.mark__glyph{
-  width:1.6rem;height:1.6rem;flex:none;border-radius:7px;
-  background:
-    linear-gradient(var(--scarlet) 0 0) 50% 50% / 62% 16% no-repeat,
-    linear-gradient(rgba(255,255,255,.42) 0 0) 50% 24% / 62% 12% no-repeat,
-    linear-gradient(rgba(255,255,255,.42) 0 0) 50% 76% / 62% 12% no-repeat,
-    linear-gradient(140deg,var(--egyptian),var(--egyptian-deep));
-  box-shadow:0 2px 6px rgba(16,52,166,.35);
+/* The console's full logo, shown as a mask so it takes the theme's logo
+   colour (Egyptian blue in light, white in dark). */
+.mark__logo{
+  display:block;height:1.375rem;aspect-ratio:1096 / 200;flex:none;
+  background:var(--logo);
+  -webkit-mask:url("../images/logo.png") center / contain no-repeat;
+          mask:url("../images/logo.png") center / contain no-repeat;
 }
-.mark__word{font-weight:800;font-size:1.1rem;letter-spacing:-.03em}
 
 .masthead__end{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4)}
 .masthead__nav,.masthead__account{display:flex;align-items:center;gap:var(--s1)}
@@ -247,26 +245,49 @@ a:hover{text-decoration-thickness:2px}
 .masthead__account a.masthead__cta{color:#fff;background:var(--scarlet-ink);box-shadow:0 4px 12px rgba(212,32,0,.28)}
 .masthead__account a.masthead__cta:hover{color:#fff;background:var(--scarlet-ink);filter:brightness(1.08)}
 
-/* Light / Dark / Auto, as a small segmented control. */
+/* Light / Dark / Auto, at the bottom of the footer: a round icon button
+   showing the current choice, opening a menu of the three upward. The
+   footer is dark in both themes, so the button is styled for it. */
 .theme[hidden]{display:none}
-.theme{display:flex;padding:2px;border-radius:var(--pill);background:var(--paper-2);border:1px solid var(--rule-soft)}
-.theme button{
-  font:600 .72rem/1 var(--ui);padding:.38rem .6rem;border:0;border-radius:var(--pill);
-  background:none;color:var(--ink-3);cursor:pointer;
+.theme{position:relative}
+.theme__toggle{
+  display:flex;align-items:center;justify-content:center;
+  width:2rem;height:2rem;padding:0;border-radius:50%;
+  color:#C4D0EC;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
 }
-.theme button:hover{color:var(--ink)}
-.theme button[aria-pressed="true"]{background:var(--card);color:var(--stamp);box-shadow:var(--shadow-sm)}
+.theme__toggle:hover,.theme__toggle[aria-expanded="true"]{color:#fff;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32)}
+.theme__toggle [data-icon]{display:none;flex:none}
+.theme[data-current="light"] .theme__toggle [data-icon="light"],
+.theme[data-current="dark"] .theme__toggle [data-icon="dark"],
+.theme[data-current="system"] .theme__toggle [data-icon="system"]{display:block}
+.theme__menu{
+  position:absolute;bottom:calc(100% + .4rem);left:0;z-index:20;
+  min-width:9rem;margin:0;padding:.3rem;list-style:none;
+  background:var(--card);border:1px solid var(--rule-soft);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);
+}
+.theme__menu[hidden]{display:none}
+.theme__menu button{
+  display:flex;align-items:center;gap:.6rem;width:100%;
+  font:600 .85rem/1 var(--ui);padding:.55rem .65rem;border:0;border-radius:calc(var(--r-lg) - .3rem);
+  background:none;color:var(--ink-2);cursor:pointer;text-align:left;
+}
+.theme__menu button:hover,.theme__menu button:focus-visible{background:var(--egyptian-wash);color:var(--ink);outline:none}
+.theme__menu button[aria-checked="true"]{color:var(--stamp)}
+.theme__menu button[aria-checked="true"]::after{
+  content:"";margin-left:auto;width:.5rem;height:.5rem;border-radius:50%;background:currentColor;
+}
 
 /* Narrower screens keep the account links and drop the rest, which the
    footer and the guide already reach. */
 @media (max-width:68rem){.masthead__nav a[href$="/changelog.html"]{display:none}}
-@media (max-width:56rem){.theme{display:none !important}}
 @media (max-width:44rem){.masthead__nav a[href$="/install.html"],.masthead__nav a[href$="/guide.html"]{display:none}}
 @media (max-width:30rem){
   .masthead__in{padding:var(--s3) var(--s4);gap:var(--s3)}
   .masthead__end{gap:0}
   .masthead__nav a,.masthead__account a{font-size:.82rem;padding:.35rem .55rem}
-  .mark__word{font-size:1rem}
+  .mark__logo{height:1.25rem}
 }
 @media (max-width:24rem){.masthead__nav{display:none}}
 
@@ -289,11 +310,21 @@ a:hover{text-decoration-thickness:2px}
 .colophon__cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem}
 .colophon__cols a{color:#C4D0EC;text-decoration:none;font-size:.92rem}
 .colophon__cols a:hover{color:#fff;text-decoration:underline}
-.colophon__by{
-  margin:var(--s6) 0 0;padding-top:var(--s4);
-  border-top:1px solid rgba(255,255,255,.16);
-  font-size:.82rem;color:#A9B8D9;
+.colophon__sign{
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:var(--s5);margin-top:var(--s8);
 }
+.colophon__logo{display:block;min-width:0;max-width:100%}
+.colophon__logo img{display:block;width:clamp(12rem,42vw,36rem);max-width:100%;height:auto}
+.colophon__end{display:flex;align-items:center;gap:var(--s4)}
+/* On phones the sign-off stacks: logo, then the credit at the left and the
+   theme switch at the right, its menu opening from the right edge. */
+@media (max-width:40rem){
+  .colophon__end{flex-basis:100%;justify-content:space-between}
+  .colophon__end .theme{order:2}
+  .colophon__end .theme__menu{left:auto;right:0}
+}
+.colophon__by{margin:0;font-size:.82rem;color:#A9B8D9}
 .colophon__by a{font-weight:700;text-decoration:none}
 .colophon__by a:hover{text-decoration:underline}
 
@@ -919,3 +950,10 @@ h3.band__title{font-size:clamp(1.35rem,2.4vw,1.65rem)}
 }
 
 html{scroll-behavior:smooth;scroll-padding-top:5rem}
+
+/* ---- utilities ---------------------------------------------------------------- */
+
+/* Last, so a utility on an element wins over its component's own margin
+   (.hero__cta resets margin to 0, which used to cancel .mt-4). */
+.mt-4{margin-top:var(--s4)}
+.mt-7{margin-top:var(--s7)}
