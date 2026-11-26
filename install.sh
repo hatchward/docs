@@ -10,7 +10,7 @@
 # browser arrives carrying com.apple.quarantine, which survives extraction and
 # `install`, and macOS then kills the binary with SIGKILL and prints nothing at
 # all. curl does not set that attribute, so every route through this script is
-# immune to it. See docs/install.md, "The macOS quarantine trap".
+# immune to it. See https://hatchward.dev/install.html, "The macOS quarantine trap".
 #
 # Read before running, if you like — that is why the inspect-first form is
 # documented next to the pipe:
