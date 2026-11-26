@@ -73,3 +73,5 @@ The code appears in the error hatchward prints.
 | `ESVC003` | The boot service's unit file could not be written or removed. | Check that your home directory is writable, then run `hatchward service install` again. |
 | `ESVC004` | The supervisor refused to load or unload the boot service. | Run the reported command yourself to see what the supervisor says, then run `hatchward service install` again. |
 | `ESVC005` | The service was installed, but it will start at login rather than at boot. | Run `loginctl enable-linger` for this account with the privileges it asks for, or pass --linger=false to accept a service that starts at login. |
+| `ESVC006` | No boot service runs the runner, so there is nothing to restart. | Run `hatchward service install` or `brew services start hatchward` to put the runner under a supervisor, or stop the `hatchward` you started by hand and start it again. |
+| `ESVC007` | Two boot services run the runner, so hatchward will not choose one to restart. | Keep one: run `hatchward service uninstall` or `brew services stop hatchward`, then run `hatchward service restart` again. |
