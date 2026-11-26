@@ -91,22 +91,39 @@
     wide.addEventListener('change', sync);
   }
 
-  /* Light / Dark / Auto. head.html applies a saved choice before paint; this
-     shows the switch and keeps the choice. Auto removes it, so the system
-     setting decides again. */
+  /* Light / Dark / Auto, as a dropdown menu. head.html applies a saved
+     choice before paint; this shows the switch, runs the menu and keeps the
+     choice. Auto removes it, so the system setting decides again. */
   var theme = document.getElementById('theme');
   if (theme) {
     var root = document.documentElement;
+    var toggle = theme.querySelector('.theme__toggle');
+    var menu = theme.querySelector('.theme__menu');
+    var items = Array.prototype.slice.call(menu.querySelectorAll('[role="menuitemradio"]'));
+    var label = theme.querySelector('.theme__label');
     var show = function () {
       var now = root.getAttribute('data-theme') || 'system';
-      theme.querySelectorAll('button').forEach(function (b) {
-        b.setAttribute('aria-pressed', String(b.dataset.themeChoice === now));
+      theme.setAttribute('data-current', now);
+      items.forEach(function (b) {
+        var on = b.dataset.themeChoice === now;
+        b.setAttribute('aria-checked', String(on));
+        if (on) label.textContent = b.textContent.trim();
       });
     };
-    theme.addEventListener('click', function (e) {
-      var b = e.target.closest('button');
-      if (!b) return;
-      var choice = b.dataset.themeChoice;
+    var open = function (focusIndex) {
+      menu.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      var i = typeof focusIndex === 'number' ? focusIndex
+        : items.findIndex(function (b) { return b.getAttribute('aria-checked') === 'true'; });
+      items[(i + items.length) % items.length].focus();
+    };
+    var close = function (refocus) {
+      if (menu.hidden) return;
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      if (refocus) toggle.focus();
+    };
+    var choose = function (choice) {
       if (choice === 'system') root.removeAttribute('data-theme');
       else root.setAttribute('data-theme', choice);
       try {
@@ -114,6 +131,31 @@
         else localStorage.setItem('hatchward-theme', choice);
       } catch (err) { /* storage blocked: the choice lasts for this page only */ }
       show();
+    };
+    toggle.addEventListener('click', function () {
+      if (menu.hidden) open(); else close(false);
+    });
+    toggle.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); open(0); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); open(items.length - 1); }
+    });
+    menu.addEventListener('click', function (e) {
+      var b = e.target.closest('[role="menuitemradio"]');
+      if (!b) return;
+      choose(b.dataset.themeChoice);
+      close(true);
+    });
+    menu.addEventListener('keydown', function (e) {
+      var i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+      else if (e.key === 'Tab') close(false);
+    });
+    document.addEventListener('click', function (e) {
+      if (!theme.contains(e.target)) close(false);
     });
     show();
     theme.hidden = false;
