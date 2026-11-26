@@ -1,0 +1,179 @@
+---
+layout: default
+title: Pricing
+---
+{%- comment -%}
+  Plans, prices and limits mirror hatchward/core's Stripe plan catalog (the file
+  Terraform applies to Stripe in live mode). When a plan changes there, change it
+  here in the same release. Prices are monthly, in US dollars.
+{%- endcomment -%}
+
+<main id="main">
+
+  <section class="pagehead">
+    <div class="pagehead__in">
+      <p class="lab">Pricing</p>
+      <h1 class="pagehead__h">One monthly price. Your machines, your model accounts.</h1>
+      <p class="pagehead__sub">
+        A plan covers the Hatchward console and control plane. The machines your agents
+        run on and the model usage they spend are yours, at your own rates, with no
+        markup from us.
+      </p>
+    </div>
+  </section>
+
+  <section class="plans" aria-label="Plans">
+    <div class="plans__in">
+
+      <article class="plan">
+        <p class="plan__name">Starter</p>
+        <p class="plan__for">For one team trying agents on a few repositories.</p>
+        <p class="plan__price"><span class="plan__amt">$59.99</span><span class="plan__per">/ month</span></p>
+        <a class="btn plan__btn" href="{{ site.console }}">Start with Starter</a>
+        <ul class="plan__caps">
+          <li><strong>3</strong> projects</li>
+          <li><strong>5</strong> runners</li>
+          <li><strong>2</strong> assignments at once</li>
+        </ul>
+      </article>
+
+      <article class="plan plan--lead">
+        <p class="plan__name">Operator</p>
+        <p class="plan__for">For a fleet working many projects in parallel.</p>
+        <p class="plan__price"><span class="plan__amt">$149.99</span><span class="plan__per">/ month</span></p>
+        <a class="btn plan__btn" href="{{ site.console }}">Start with Operator</a>
+        <ul class="plan__caps">
+          <li><strong>10</strong> projects</li>
+          <li><strong>25</strong> runners</li>
+          <li><strong>20</strong> assignments at once</li>
+        </ul>
+      </article>
+
+      <article class="plan">
+        <p class="plan__name">Scale</p>
+        <p class="plan__for">For organisations running agents across many teams.</p>
+        <p class="plan__price"><span class="plan__amt">$199.99</span><span class="plan__per">/ month</span></p>
+        <a class="btn plan__btn" href="{{ site.console }}">Start with Scale</a>
+        <ul class="plan__caps">
+          <li><strong>100</strong> projects</li>
+          <li><strong>250</strong> runners</li>
+          <li><strong>100</strong> assignments at once</li>
+        </ul>
+      </article>
+
+    </div>
+    <p class="plans__fine">
+      Prices in US dollars, billed monthly. Sales tax or VAT is added at checkout where it
+      applies. Create your account first, then choose a plan under
+      <strong>Plan &amp; billing</strong> in the console.
+    </p>
+  </section>
+
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Every plan</p>
+        <h2 class="band__title">The same product on every plan. Only the limits change.</h2>
+      </div>
+
+      <div class="incl">
+        <ul class="ticks">
+          <li>The Hatchward console: projects, runners, and work as it runs</li>
+          <li>The project setup wizard, from board to publish</li>
+          <li>Notion, Mahfouz and GitHub Projects as ticket sources</li>
+          <li>Repository access through the GitHub App, with no tokens typed in</li>
+        </ul>
+        <ul class="ticks">
+          <li>Every assignment in its own container</li>
+          <li>Credentials that stay on your machines and never reach Hatchward</li>
+          <li>One-time enrollment codes for each machine</li>
+          <li>The runner for macOS and Linux, as a boot service</li>
+        </ul>
+      </div>
+
+      <div class="layers mt-7">
+        <div class="layer">
+          <p class="lab">Not in the price</p>
+          <p class="layer__h">model usage</p>
+          <p class="layer__p">
+            Agents call your own model vendor accounts, so that spend goes straight to the
+            vendor at your rates. Hatchward adds nothing per task or per token.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Not in the price</p>
+          <p class="layer__h">the machines</p>
+          <p class="layer__p">
+            Runners are machines you already own or rent: a build box, a cloud VM, a Mac
+            under a desk. There's no hosted compute to buy and no queue to wait in.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Questions</p>
+        <h2 class="band__title">How the limits and billing work.</h2>
+      </div>
+
+      <div class="faq">
+        <details class="faq__q" open>
+          <summary>What counts as a project, a runner and an assignment?</summary>
+          <p>
+            A <strong>project</strong> is one published setup in the console: a board, its
+            repositories, and how tickets are routed. A <strong>runner</strong> is one
+            enrolled machine. An <strong>assignment</strong> is one ticket being worked in
+            its own container; "at once" is how many can run across your account at the
+            same moment. Tickets beyond that wait until one finishes.
+          </p>
+        </details>
+        <details class="faq__q">
+          <summary>Can I set things up before I pay?</summary>
+          <p>
+            Yes. Creating an account, connecting integrations and drafting a project need
+            no plan. A subscription is needed to publish a project, enroll a runner and
+            start new assignments.
+          </p>
+        </details>
+        <details class="faq__q">
+          <summary>How do I change plans or cancel?</summary>
+          <p>
+            From <strong>Plan &amp; billing</strong> in the console, which opens Stripe's
+            customer portal, where you manage or cancel the subscription.
+          </p>
+        </details>
+        <details class="faq__q">
+          <summary>What happens if a payment fails?</summary>
+          <p>
+            New work stays available while the payment is retried, and the console tells
+            you it needs attention. If the subscription ends, new work pauses; assignments
+            already running can still finish and report their results.
+          </p>
+        </details>
+        <details class="faq__q">
+          <summary>What if I reach a limit?</summary>
+          <p>
+            The console says which limit you've reached when you try to publish another
+            project or enroll another runner. Move to a larger plan, or remove a runner or
+            project you no longer use.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="closer">
+    <div class="closer__in">
+      <h2 class="closer__h">Start with an account.</h2>
+      <p class="closer__p">Sign up, set up your first project, and choose a plan when you're ready to enroll a runner.</p>
+      <p class="hero__cta">
+        <a class="btn" href="{{ site.console }}">Create an account</a>
+        <a class="btn btn--ghost" href="{{ '/install.html' | relative_url }}">Read the install guide</a>
+      </p>
+    </div>
+  </section>
+
+</main>
