@@ -19,6 +19,7 @@
       <div class="masthead__end">
         <nav class="masthead__nav" aria-label="Site">
           <a href="{{ '/guide.html' | relative_url }}"{% if page.layout == 'page' and page.path != 'install.md' and page.path != 'changelog.md' %} aria-current="true"{% endif %}>Guide</a>
+          <a href="{{ '/pricing.html' | relative_url }}"{% if page.path == 'pricing.html' %} aria-current="page"{% endif %}>Pricing</a>
           <a href="{{ '/install.html' | relative_url }}"{% if page.path == 'install.md' %} aria-current="page"{% endif %}>Install</a>
           <a href="{{ '/changelog.html' | relative_url }}"{% if page.path == 'changelog.md' %} aria-current="page"{% endif %}>Changelog</a>
         </nav>
@@ -32,6 +33,11 @@
           <button type="button" data-theme-choice="dark">Dark</button>
           <button type="button" data-theme-choice="system">Auto</button>
         </div>
+        {%- comment -%} The hosted console, where every account starts. {%- endcomment %}
+        <nav class="masthead__account" aria-label="Account">
+          <a href="{{ site.console }}">Sign in</a>
+          <a class="masthead__cta" href="{{ site.console }}">Sign up</a>
+        </nav>
       </div>
     </div>
   </header>
@@ -40,11 +46,15 @@
 
   <footer class="colophon">
     <div class="colophon__in">
-      <p class="colophon__line">
-        <span class="lab">hatchward</span> is proprietary software, licensed rather than sold.
-        See the licence terms for what that means for you.
-      </p>
-      <nav class="colophon__cols" aria-label="Guide pages">
+      <nav class="colophon__cols" aria-label="Site pages">
+        <div>
+          <p class="lab">Hatchward</p>
+          <ul>
+            <li><a href="{{ site.console }}">Create an account</a></li>
+            <li><a href="{{ site.console }}">Sign in</a></li>
+            <li><a href="{{ '/pricing.html' | relative_url }}">Pricing</a></li>
+          </ul>
+        </div>
         {%- for group in site.data.nav.groups %}
         <div>
           <p class="lab">{{ group.group }}</p>

@@ -10,27 +10,27 @@ title: Guide
 <h1>hatchward guide</h1>
 
 <p class="lede">
-  hatchward runs coding-agent work on machines you own. You enroll a machine, connect
-  a project's ticket source, and publish a policy; the hosted control plane then hands
-  the machine assignments, each in its own container.
+  hatchward runs coding-agent work on machines you own. You create an account in the
+  console, connect a project's ticket source and publish it, then enroll a machine;
+  the hosted control plane hands the machine assignments, each in its own container.
 </p>
 
 <p class="lab guide__steps-h">Get running in three steps</p>
 <ol class="steps">
   <li class="step">
-    <span class="lab">Install</span>
-    <a class="step__t" href="{{ '/install.html' | relative_url }}#install">Put the CLI on a machine</a>
-    <span class="step__b">One line on macOS and Linux, or Homebrew.</span>
+    <span class="lab">Sign up</span>
+    <a class="step__t" href="{{ site.console }}">Create an account</a>
+    <span class="step__b">Enter your email at the console and paste the code it sends.</span>
+  </li>
+  <li class="step">
+    <span class="lab">Set up</span>
+    <a class="step__t" href="#ticket-sources">Connect a ticket source and publish a project</a>
+    <span class="step__b">Notion, Mahfouz or GitHub Projects, connected from Integrations.</span>
   </li>
   <li class="step">
     <span class="lab">Enroll</span>
-    <a class="step__t" href="{{ '/install.html' | relative_url }}#first-run">Run <code>hatchward</code></a>
-    <span class="step__b">Enter the one-time code. The machine then waits for work.</span>
-  </li>
-  <li class="step">
-    <span class="lab">Connect</span>
-    <a class="step__t" href="#ticket-sources">Choose a ticket source</a>
-    <span class="step__b">Notion, Mahfouz or GitHub Projects, connected from Integrations.</span>
+    <a class="step__t" href="{{ '/install.html' | relative_url }}#first-run">Install the CLI and enroll a machine</a>
+    <span class="step__b">Paste the one-time code from the console. The machine then waits for work.</span>
   </li>
 </ol>
 

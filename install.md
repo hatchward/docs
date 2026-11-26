@@ -11,6 +11,30 @@ Every route below verifies the tarball it installs against the `SHA256SUMS`
 manifest published in the same release, which proves the two are
 self-consistent, not where either came from.
 
+## Before you start: an account and a project
+
+A runner works projects that already exist in a Hatchward account, and it joins
+with an enrollment code the console issues. Set those up first:
+
+1. **Create an account** at [dash.hatchward.dev](https://dash.hatchward.dev).
+   Enter your email; the console sends a single-use code that signs you in, or
+   creates the account if there isn't one. There's no password.
+2. **Choose a plan** under **Plan & billing**. Enrolling a runner needs an
+   active plan.
+3. **Connect your board and GitHub** under **Integrations**. Repository access
+   goes through the GitHub App. See [Notion tickets](notion.md),
+   [Mahfouz tickets](mahfouz.md) and [GitHub Projects](github-projects.md) for
+   the ticket sources.
+4. **Create and publish a project.** The setup wizard walks through *Board*,
+   *Repositories*, *Map tickets*, *Agents & routing* and *Review & publish*.
+   Nothing takes effect until it's published.
+5. **Generate an enrollment code** from **Fleet** (or the project's page),
+   choosing the projects this machine should work. Keep the page open: the
+   code is single-use and expires, and the console shows the commands to copy.
+
+Then install the CLI on the machine, below, and enroll it under
+[First run](#first-run).
+
 ## Install
 
 ### One line, macOS and Linux
@@ -260,30 +284,42 @@ For a source checkout before contract-3 images are published:
 3. Select that exact local image tag in the project's hosted agent configuration, and add
    the same tag to `runtime.agentImages` in `~/.hatchward/runner.yml`.
 4. Configure the host credential files above, allocate the assignment's disk and memory
-   ceilings, then enroll and enable the project below. A local image must be present in
-   the Docker context used by the runner.
+   ceilings, then enroll below. A local image must be present in the Docker context
+   used by the runner.
+
+With an enrollment code from the console (see
+[Before you start](#before-you-start-an-account-and-a-project)):
 
 ```sh
-hatchward                                                             # asks for an enrollment code, then runs
-hatchward project enable <project-id> --workspace-root <alias> --path <dir>
-hatchward service install
+hatchward enroll --name <runner-name>   # asks for the code and a workspace folder
+hatchward service install               # runs it as a boot service from now on
+# or, to run it in this terminal instead:
+hatchward
 ```
 
-**Bare `hatchward` is the whole loop.** On an unenrolled machine it prompts for
-a one-time enrollment code, enrolls, and then runs; on an already-enrolled one
-it starts asking the hosted control plane for work immediately. Scripted or
-unattended setups skip the prompt with `hatchward enroll --code-stdin`, piping
-the code on stdin — a boot-service unit with no TTY on an unenrolled machine
-fails fast with a named error rather than hanging on a prompt. If the code is
-wrong, expired, or already used, enrollment fails with the server's error and
-nothing is written; re-run with a fresh code.
+**Enrolling turns on the code's projects.** `hatchward enroll` asks for the
+one-time code, then for a folder to keep workspaces in (default
+`<runner home>/workspaces`, created if missing), and enables every project the
+code was issued for under the alias `workspaces`. `--path <dir>` names the
+folder and skips that question. The folder is checked before the code is
+redeemed. If the code is wrong, expired, or already used, enrollment fails with
+the server's error and nothing is written; generate a fresh code and re-run.
+If the projects can't be fetched, enrollment still succeeds and says how to
+enable them by hand.
 
-**Enable at least one project before there is anything to run.**
-`<project-id>` is the canonical UUID the hosted console shows for the project.
-`hatchward project enable <project-id> --workspace-root <alias> --path <dir>`
-binds it to a local directory, under an alias you choose. Repeat it for every
-project this machine should work; `hatchward project list` shows what is
-enabled, and `hatchward project disable <project-id>` turns one off without
+**Bare `hatchward` is the whole loop.** On an unenrolled machine it does the
+same enrollment first, then runs; on an already-enrolled one it starts asking
+the hosted control plane for work immediately. Scripted or unattended setups
+pipe the code with `hatchward enroll --code-stdin` (without `--path`, the
+default workspace folder is used) — a boot-service unit with no TTY on an
+unenrolled machine fails fast with a named error rather than hanging on a
+prompt.
+
+**Adding or removing projects later.** `hatchward project enable` binds a
+project to a local directory: `--project-slug <slug>` (asks the hosted API for
+the id) or `--project-id <uuid>`, with `--workspace-root <alias> --path <dir>`.
+`hatchward project list` shows each enabled project and, when one can't run on
+this machine, why; `hatchward project disable` turns one off without
 discarding the alias.
 
 **`hatchward service install` keeps it running.** It registers the runner as a

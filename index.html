@@ -10,25 +10,184 @@ title: Hatchward
     <div class="hero__in">
       <div class="hero__say">
         <p class="lab">Hosted agent-fleet runner</p>
-        <h1 class="hero__h">Enroll <em class="you">your</em> machine. It runs what the control plane hands it.</h1>
+        <h1 class="hero__h">Your board. Your repos. Agents on <em class="you">your</em> machines.</h1>
         <p class="hero__lede">
-          Install the CLI, enroll with a one-time code, and the machine starts asking the
-          hosted control plane for work. Each assignment spawns a coding-agent worker in its
-          own container, on your machine, calling your own model accounts — no board
-          credentials on the CLI, no local database to run, nothing to elect.
+          Create an account, connect your board and repositories in the Hatchward console,
+          and publish a project. Then enroll any machine you own with a one-time code. It
+          runs each ticket in its own container, on your own model accounts, and your
+          credentials never leave it.
         </p>
         <p class="hero__cta">
-          <a class="btn" href="#install">Set up a runner</a>
-          <a class="btn btn--ghost" href="{{ '/guide.html' | relative_url }}">Read the guide</a>
+          <a class="btn" href="{{ site.console }}">Create an account</a>
+          <a class="btn btn--ghost" href="#how">How it works</a>
+        </p>
+        <p class="hero__fine">Sign in with a code sent to your email. No password to set.</p>
+      </div>
+
+      <ol class="hsteps" aria-label="Getting started">
+        <li class="hstep">
+          <span class="hstep__n" aria-hidden="true">1</span>
+          <div>
+            <p class="hstep__h">Sign up</p>
+            <p class="hstep__p">Enter your email at the console and paste the single-use code it sends you.</p>
+          </div>
+        </li>
+        <li class="hstep">
+          <span class="hstep__n" aria-hidden="true">2</span>
+          <div>
+            <p class="hstep__h">Set up a project</p>
+            <p class="hstep__p">Connect a board and repositories, map tickets, choose the agent, then publish.</p>
+          </div>
+        </li>
+        <li class="hstep">
+          <span class="hstep__n" aria-hidden="true">3</span>
+          <div>
+            <p class="hstep__h">Enroll a runner</p>
+            <p class="hstep__p">Generate an enrollment code, then run one command on your machine.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── how it works ──────────────────────────────────────────────────── -->
+  <section class="band" id="how">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">How it works</p>
+        <h2 class="band__title">Set up the project in the console first. Machines come after.</h2>
+        <p class="band__sub">
+          Everything about what to run lives in your Hatchward account: the board, the
+          repositories, which agent takes which ticket. A runner joins later, with a code
+          issued for the projects it should work, and asks for nothing else.
         </p>
       </div>
 
-      <div>
-        <pre class="shellblock"><span class="c"># first run on a fresh machine</span>
-<span class="p">$</span> hatchward
-enrollment code: ••••-••••
-enrolled as build01-a3f1
-waiting for an assignment…</pre>
+      <div class="trio">
+        <div class="layer">
+          <p class="lab">Step 1 · Account</p>
+          <p class="layer__h">sign up at the console</p>
+          <p class="layer__p">
+            Enter your email at <a href="{{ site.console }}">dash.hatchward.dev</a>. A
+            single-use code arrives by email, and the same screen signs you in or creates
+            your account. There's no password to set or lose.
+          </p>
+          <p class="layer__p">
+            Pick a <a href="{{ '/pricing.html' | relative_url }}">plan</a> under
+            <strong>Plan &amp; billing</strong>. Enrolling runners needs an active plan.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Step 2 · Project</p>
+          <p class="layer__h">walk the setup wizard</p>
+          <p class="layer__p">
+            Connect your board and GitHub under <strong>Integrations</strong>, then
+            create a project. The wizard has five steps: <em>Board</em>,
+            <em>Repositories</em>, <em>Map tickets</em>, <em>Agents &amp; routing</em> and
+            <em>Review &amp; publish</em>.
+          </p>
+          <p class="layer__p">
+            Nothing takes effect until you publish it. Repository access goes through the
+            GitHub App, so you never type a token into the console.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">Step 3 · Runner</p>
+          <p class="layer__h">enroll your machine</p>
+          <p class="layer__p">
+            In the console, choose the projects a machine should work and generate an
+            enrollment code. Install the CLI on that machine, run
+            <code>hatchward enroll</code> and paste the code.
+          </p>
+          <p class="layer__p">
+            Enrolling turns on every project the code was issued for. The runner then
+            waits for assignments, and the console shows each one as it runs.
+          </p>
+        </div>
+      </div>
+
+      <p class="band__cta">
+        <a class="btn" href="{{ site.console }}">Create an account</a>
+        <a class="btn btn--ghost" href="{{ '/install.html' | relative_url }}">Read the install guide</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── secrets ───────────────────────────────────────────────────────── -->
+  <section class="band" id="secrets">
+    <div class="band__in">
+      <div class="band__head">
+        <p class="lab">Secrets</p>
+        <h2 class="band__title">Your credentials stay on your machine. The agent never holds one.</h2>
+        <p class="band__sub">
+          Hatchward's account knows which project needs which secret. It never sees the
+          values. They live on the runner, and the runner adds each one to the agent's
+          request on the way out, so the code the agent runs can't read or leak them.
+        </p>
+      </div>
+
+      <div class="trio">
+        <div class="layer">
+          <p class="lab">On the host</p>
+          <p class="layer__h">values never reach Hatchward</p>
+          <p class="layer__p">
+            Model keys and tokens are files in the runner's home, set per project, readable
+            only by the runner's own user. They're read when an assignment starts and
+            cleared from memory when it ends. They never travel to the control plane, and
+            never appear in the runner's arguments, environment or config.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">In the container</p>
+          <p class="layer__h">a placeholder, not a key</p>
+          <p class="layer__p">
+            The agent's container has no network of its own. Its traffic goes through a
+            proxy the runner starts for that one assignment. The proxy swaps a placeholder
+            for the real credential on the request to the model or GitHub, so the real
+            value never enters the container.
+          </p>
+        </div>
+        <div class="layer">
+          <p class="lab">At the edge</p>
+          <p class="layer__h">an allowlist you control</p>
+          <p class="layer__p">
+            The proxy refuses any host that isn't on the allowlist: the runner's own short
+            base list, plus exact hostnames you add. It closes when the assignment ends,
+            and its access token stops working at the same moment.
+          </p>
+        </div>
+      </div>
+
+      <div class="next">
+        <div class="next__head">
+          <span class="pill">In development</span>
+          <p class="next__lede">
+            Next for secrets. This is being designed now and isn't in a release yet; the
+            details may change before it ships.
+          </p>
+        </div>
+        <ul class="slots">
+          <li>
+            <span class="slots__k">Declared secrets</span>
+            <span class="slots__v">per project</span>
+            <span class="slots__n">A project names the secrets its agents need and where each one may be sent. You supply the values on the runner and approve each destination there; a later change to the project can't redirect a secret or open new egress until you confirm it on the machine.</span>
+          </li>
+          <li>
+            <span class="slots__k">Brokers</span>
+            <span class="slots__v">use, don't read</span>
+            <span class="slots__n">A companion container, on an image you trust, holds a secret the agent can use but never see — an SSH agent for git, or an auth proxy in front of a database.</span>
+          </li>
+          <li>
+            <span class="slots__k">Short-lived GitHub tokens</span>
+            <span class="slots__v">one repo, one assignment</span>
+            <span class="slots__n">Each assignment gets a GitHub App token scoped to the one repository it works on, minted when needed and never stored, in place of a long-lived personal token.</span>
+          </li>
+          <li>
+            <span class="slots__k">Two keys per project</span>
+            <span class="slots__v">console + runner</span>
+            <span class="slots__n">A runner is offered a project only when your account has granted it and the machine's operator has enabled it and supplied its secrets. A stolen runner key can't reach a project the account never gave that runner.</span>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -38,80 +197,42 @@ waiting for an assignment…</pre>
     <div class="band__in">
       <div class="band__head">
         <p class="lab">Structure</p>
-        <h2 class="band__title">The runner enrolls and executes. Assignment lives with the control plane.</h2>
+        <h2 class="band__title">The console decides what runs. Your machines run it.</h2>
         <p class="band__sub">
           The binary you install is thin on purpose: identity, service supervision, and a
-          container per assignment. What to run, in what order, and on which model is
-          decided by the hosted control plane and arrives with the assignment itself.
+          container per assignment. What to run, in what order, and on which model is set
+          in the console and arrives with the assignment itself.
         </p>
       </div>
 
       <div class="layers">
         <div class="layer">
-          <p class="lab">Layer 1</p>
-          <p class="layer__h">the hatchward binary</p>
+          <p class="lab">Hosted</p>
+          <p class="layer__h">the Hatchward console</p>
           <p class="layer__p">
-            Bare <code>hatchward</code> is the whole operator loop: it enrolls an
-            unenrolled machine, then asks the hosted control plane for work and spawns and
-            watches a containerized worker for each assignment it gets.
+            Your board, your repositories, your routing, and which model and role each task
+            calls for are set up here. So are your runners: you issue their enrollment
+            codes, choose their projects, and watch their work live.
           </p>
           <p class="layer__p">
-            It owns runner identity, container isolation, and boot-time supervision —
-            nothing else runs locally.
+            The assignment a runner receives already carries what its worker needs, so no
+            board credential ever sits on a machine.
           </p>
         </div>
         <div class="layer">
-          <p class="lab">Layer 2</p>
-          <p class="layer__h">the hosted control plane</p>
+          <p class="lab">On your machines</p>
+          <p class="layer__h">the hatchward runner</p>
           <p class="layer__p">
-            Your board, your routing, and which model and role each task calls for are
-            configuration on the hosted side. The assignment a runner receives already
-            carries the normalized fields a worker needs.
+            <code>hatchward enroll</code> joins a machine to your account. After that, bare
+            <code>hatchward</code> holds a connection to the control plane, receives
+            assignments, and starts and watches a container for each one.
           </p>
           <p class="layer__p">
-            Worker-facing board, ask, and lifecycle operations route through
-            assignment-scoped hosted APIs — the CLI itself holds no board credentials.
+            It owns the runner's identity, container isolation, your credentials, and
+            restart on boot. Nothing else runs locally.
           </p>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ── projects ──────────────────────────────────────────────────────── -->
-  <section class="band">
-    <div class="band__in">
-      <div class="band__head">
-        <p class="lab">Projects</p>
-        <h2 class="band__title">One runner, as many projects as you enable.</h2>
-        <p class="band__sub">
-          A machine enrolls once. Which hosted projects it actually works, and where each
-          project's workspace lives on disk, is a separate, per-machine choice.
-        </p>
-      </div>
-
-      <ul class="slots">
-        <li>
-          <span class="slots__k">List</span>
-          <span class="slots__v"><code>project list</code></span>
-          <span class="slots__n">Every project this machine has enabled, per its own <code>runner.yml</code>.</span>
-        </li>
-        <li>
-          <span class="slots__k">Enable</span>
-          <span class="slots__v"><code>project enable &lt;id&gt;</code></span>
-          <span class="slots__n">With <code>--workspace-root &lt;alias&gt; --path &lt;dir&gt;</code>, binds a hosted project to a local directory under an alias you name.</span>
-        </li>
-        <li>
-          <span class="slots__k">Disable</span>
-          <span class="slots__v"><code>project disable &lt;id&gt;</code></span>
-          <span class="slots__n">Stops this machine picking up work for that project; the workspace alias is left in place.</span>
-        </li>
-      </ul>
-
-      <p class="band__note">
-        <strong>No board credentials on the CLI.</strong> Board, routing, and
-        worker-facing lifecycle operations run through hosted APIs scoped to the
-        assignment — the runner never holds a token that could reach your board directly.
-      </p>
     </div>
   </section>
 
@@ -135,8 +256,8 @@ waiting for an assignment…</pre>
           <p class="lab">Cost shape</p>
           <p class="layer__h">your accounts, your rates</p>
           <p class="layer__p">
-            Model spend runs on the accounts you already hold. No per-seat, no per-task
-            markup, no metered middleman standing between you and the model.
+            Model spend runs on the accounts you already hold. No per-task markup and no
+            metered middleman between you and the model.
           </p>
         </div>
         <div class="layer">
@@ -152,59 +273,16 @@ waiting for an assignment…</pre>
           <p class="layer__h">no new vendor on the network</p>
           <p class="layer__p">
             Whatever your build machines already reach, the agents reach: same VPN, same
-            egress rules, same secrets manager, same git credentials. Nothing new to
-            approve.
+            egress rules, same git credentials. Nothing new to approve.
           </p>
         </div>
       </div>
-
-      <p class="band__note">
-        <strong>Workers are sandboxed.</strong> Every assignment runs in its own container,
-        spawned and watched by the runner — isolation is not a setting you choose, it is
-        the only mode there is.
-      </p>
 
       <p class="band__note">
         One thing this does not claim: your code does leave the network, on the model call
         you were already making. What is added is the runner's own outbound connection to
         the hosted control plane that hands out assignments.
       </p>
-    </div>
-  </section>
-
-  <!-- ── coordination ──────────────────────────────────────────────────── -->
-  <section class="band">
-    <div class="band__in">
-      <div class="band__head">
-        <p class="lab">Coordination</p>
-        <h2 class="band__title">Assignment lives in one place, not brokered by each machine.</h2>
-        <p class="band__sub">
-          Every runner asks the same hosted control plane for work; nothing is negotiated
-          between machines. There is no leader to elect and no registry to poll, because
-          there is only one authority.
-        </p>
-      </div>
-
-      <div class="layers">
-        <div class="layer">
-          <p class="lab">What the control plane owns</p>
-          <p class="layer__h">assignment, routing, the audit trail</p>
-          <p class="layer__p">
-            A task goes to exactly one runner, at a time the control plane decides. Board
-            state, routing rules, and the record of what ran, where, and why are all
-            hosted — not something any one machine's crash or restart puts at risk.
-          </p>
-        </div>
-        <div class="layer">
-          <p class="lab">What the runner owns</p>
-          <p class="layer__h">its own identity, and nothing else's</p>
-          <p class="layer__p">
-            A runner knows who it is and which projects it has enabled. It asks for work,
-            executes what it is given in a container, and reports back — it holds no
-            opinion about any other machine in the fleet.
-          </p>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -215,8 +293,9 @@ waiting for an assignment…</pre>
         <p class="lab">What the runner guarantees</p>
         <h2 class="band__title">Small surface, so there is less to get wrong.</h2>
         <p class="band__sub">
-          The cutover traded a scheduler's worth of local guarantees for a hosted control
-          plane's. What is left on the machine is deliberately narrow.
+          Assignment, routing and the audit trail live in one place, the control plane.
+          No machine negotiates with another, so there's no leader to elect and nothing to
+          split. What's left on each machine is deliberately narrow.
         </p>
       </div>
 
@@ -224,7 +303,7 @@ waiting for an assignment…</pre>
         <li>
           <span class="slots__k">Identity fails loud</span>
           <span class="slots__v"><code>runner.identity</code></span>
-          <span class="slots__n">A corrupt or unreadable identity file is returned as an error, never silently re-enrolled — a crash-recovery guard against re-registering a machine that already has a history.</span>
+          <span class="slots__n">A corrupt or unreadable identity file is returned as an error, never silently re-enrolled, so a machine that already has a history is never registered twice.</span>
         </li>
         <li>
           <span class="slots__k">One mode of isolation</span>
@@ -234,20 +313,19 @@ waiting for an assignment…</pre>
         <li>
           <span class="slots__k">Restart, don't babysit</span>
           <span class="slots__v"><code>hatchward service install</code></span>
-          <span class="slots__n">A launchd or systemd unit supervises the process, so a crash or a reboot resumes on its own — no terminal or tmux session to keep alive.</span>
+          <span class="slots__n">A launchd or systemd unit supervises the process, so a crash or a reboot resumes on its own. Homebrew's <code>brew services</code> works too.</span>
+        </li>
+        <li>
+          <span class="slots__k">Says why it's idle</span>
+          <span class="slots__v"><code>hatchward project list</code></span>
+          <span class="slots__n">When a project can't run on a machine, the runner names the reason in its log and in the console, instead of quietly taking no work.</span>
         </li>
         <li>
           <span class="slots__k">Scripted enrollment</span>
           <span class="slots__v"><code>--code-stdin</code></span>
-          <span class="slots__n">Provisioning scripts and CI pipe the one-time code instead of typing it; a boot-service unit with no TTY fails fast with a named error rather than hanging on a prompt.</span>
+          <span class="slots__n">Provisioning scripts and CI pipe the one-time code instead of typing it; a boot service with no terminal fails fast with a named error rather than hanging on a prompt.</span>
         </li>
       </ul>
-
-      <p class="band__note">
-        <strong>Not part of this cutover:</strong> <code>hatchward doctor</code> and
-        <code>hatchward config show/open</code> are deferred to a follow-up. Today the
-        runner either enrolls and runs, or tells you exactly why it couldn't.
-      </p>
     </div>
   </section>
 
@@ -255,62 +333,51 @@ waiting for an assignment…</pre>
   <section class="band" id="install">
     <div class="band__in">
       <div class="band__head">
-        <p class="lab">Setup</p>
-        <h2 class="band__title">Three commands. The first one asks for a code.</h2>
+        <p class="lab">Enroll a runner</p>
+        <h2 class="band__title">An account first. Then three commands.</h2>
         <p class="band__sub">
-          One line on macOS and Linux — <code>curl -fsSL https://hatchward.dev/install.sh | sh</code>
-          — or <code>brew install hatchward/tap/hatchward</code>. Checksummed tarballs for
-          the four targets every release builds. The runtime is POSIX-only; Windows is not
-          supported in v1.
+          <a href="{{ site.console }}">Create an account</a> and publish a project before
+          you touch a machine: the enrollment code comes from the console. Then install
+          with <code>curl -fsSL https://hatchward.dev/install.sh | sh</code> or
+          <code>brew install hatchward/tap/hatchward</code>, on macOS or Linux. Docker must
+          be installed and running.
         </p>
       </div>
 
       <div class="install">
-        <pre class="shellblock"><span class="c"># first run: asks for your enrollment code, then runs</span>
-<span class="p">$</span> hatchward
+        <pre class="shellblock"><span class="c"># install the CLI</span>
+<span class="p">$</span> curl -fsSL https://hatchward.dev/install.sh | sh
 
-<span class="c"># enable a project, and where its workspace lives on disk</span>
-<span class="p">$</span> hatchward project enable acme-web \
-    --workspace-root web --path ~/fleet/acme-web
+<span class="c"># enroll with the code from the console</span>
+<span class="p">$</span> hatchward enroll --name build01
 
 <span class="c"># keep it running across reboots and crashes</span>
 <span class="p">$</span> hatchward service install</pre>
 
         <div>
           <p>
-            <strong>Bare <code>hatchward</code> is the whole loop.</strong> On a machine
-            that has not enrolled yet, it prompts for a one-time enrollment code and
-            enrolls before it runs; on a machine that already has, it starts asking the
-            hosted control plane for work immediately. Scripted or unattended setups skip
-            the prompt with <code>hatchward enroll --code-stdin</code>, piping the code on
-            stdin.
+            <strong>Get the code from the console.</strong> Open <strong>Fleet</strong>,
+            choose the projects this machine should work, and generate an enrollment code.
+            The console shows the commands to copy. A code works once, and only for a short
+            time.
           </p>
           <p>
-            <strong>Enabling a project</strong> binds a hosted project id to a local
-            directory under an alias you choose, with <code>project enable &lt;id&gt;
-            --workspace-root &lt;alias&gt; --path &lt;dir&gt;</code>. A machine can have
-            more than one project enabled; <code>project list</code> shows what is, and
-            <code>project disable</code> turns one off without discarding the alias.
+            <strong><code>hatchward enroll</code> asks for the code</strong>, then for a
+            folder to keep the projects' workspaces in, and turns on every project the code
+            was issued for. Scripts can pipe the code with <code>--code-stdin</code>. On a
+            machine that's already enrolled, bare <code>hatchward</code> starts asking for
+            work straight away.
           </p>
           <p>
             <strong><code>service install</code></strong> registers the runner as a
             boot-time service — launchd on macOS, systemd on Linux — so it survives a
             reboot or a crash without anyone watching a terminal.
-            <code>service status</code> and <code>service uninstall</code> round it out.
+          </p>
+          <p>
+            Credentials and image settings are covered in the
+            <a href="{{ '/install.html' | relative_url }}">install guide</a>.
           </p>
         </div>
-      </div>
-
-      <div class="band__head mt-7">
-        <p class="lab">Verifying a download</p>
-        <h3 class="band__title">A checksum, and platform-native signing.</h3>
-        <p class="band__sub">
-          <code>SHA256SUMS</code> in the release proves the tarball and the manifest agree
-          with each other, not where either came from. Apple Developer ID codesigning and
-          notarization, and Windows Authenticode, are supported in the release pipeline
-          where the platform credentials are configured; Homebrew installs whatever the
-          tap's formula points at.
-        </p>
       </div>
     </div>
   </section>
@@ -342,6 +409,18 @@ waiting for an assignment…</pre>
         {%- endunless %}{% endfor %}
       </ul>
       <p class="hero__cta mt-4"><a class="btn" href="{{ '/guide.html' | relative_url }}">Open the guide</a></p>
+    </div>
+  </section>
+
+  <!-- ── closing call to action ────────────────────────────────────────── -->
+  <section class="closer">
+    <div class="closer__in">
+      <h2 class="closer__h">Start with an account.</h2>
+      <p class="closer__p">Set up your first project in the console, then enroll the machines you already have.</p>
+      <p class="hero__cta">
+        <a class="btn" href="{{ site.console }}">Create an account</a>
+        <a class="btn btn--ghost" href="{{ site.console }}">Sign in</a>
+      </p>
     </div>
   </section>
 

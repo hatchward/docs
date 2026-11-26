@@ -21,13 +21,16 @@
 # the site does not work without them, so it should say so.
 
 title: Hatchward
-description: Hosted agent-fleet orchestrator — enroll a machine and it runs the assignments the hosted control plane hands it.
+description: Hosted agent-fleet orchestrator — set up a project in the console, enroll your machines, and they run the assignments it hands them.
 # Empty, not "/hatchward": the site is served from the apex of the custom domain
 # in CNAME, so its root is "/". A project-page baseurl here would send every
 # stylesheet and every document link to /hatchward/… and 404 the whole site.
 baseurl: ""
 url: https://hatchward.dev
 influpert: https://influpert.com
+# The hosted console, where an account, its projects and its runners are set up.
+# Every "Sign up" and "Sign in" link on the site points here.
+console: https://dash.hatchward.dev
 
 plugins:
   - jekyll-optional-front-matter
@@ -71,6 +74,8 @@ defaults:
     values: { redirect_from: ["/license/"] }
   - scope: { path: "notion.md" }
     values: { redirect_from: ["/notion/"] }
+  - scope: { path: "pricing.html" }
+    values: { redirect_from: ["/pricing/"] }
 
 # Without this, each document is published twice: once rendered, and once as the
 # raw .md it was read from. One document, one URL.
